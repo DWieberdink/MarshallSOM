@@ -23,7 +23,7 @@ jobs:
             echo "MAPBOX_ACCESS_TOKEN secret is not set in repository secrets."
             exit 1
           fi
-          printf "window.MAPBOX_ACCESS_TOKEN = '%s';\n" "$MAPBOX_ACCESS_TOKEN" > mapbox-config.local.js
+          printf "window.MAPBOX_ACCESS_TOKEN = '%s';\n" "$MAPBOX_ACCESS_TOKEN" > mapbox-config.js
 
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4

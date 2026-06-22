@@ -9,6 +9,7 @@
   <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <script src="mapbox-config.local.js"></script>
+  <script src="mapbox-config.js"></script>
   <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -2260,7 +2261,7 @@
 
         mapboxgl.accessToken = window.MAPBOX_ACCESS_TOKEN || '';
         if (!mapboxgl.accessToken) {
-          mapContainer.innerHTML = '<p style="padding:1rem;color:#6b7280;">Map not configured. Copy <code>mapbox-config.example.js</code> to <code>mapbox-config.local.js</code> and add your Mapbox token.</p>';
+          mapContainer.innerHTML = '<p style="padding:1rem;color:#6b7280;">Map not configured. For local use, copy <code>mapbox-config.example.js</code> to <code>mapbox-config.local.js</code>. For GitHub Pages, add the <code>MAPBOX_ACCESS_TOKEN</code> repository secret.</p>';
           return;
         }
 
