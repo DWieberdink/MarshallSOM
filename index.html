@@ -1,0 +1,4148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marshall University Joan C. Edwards School of Medicine | Dashboard</title>
+  <link rel="icon" href="Marshall SoM.png" type="image/png" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+  <script src="mapbox-config.local.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <style>
+    :root {
+      --marshall-green: #00a651;
+      --marshall-green-dark: #007a3d;
+      --marshall-green-utility: #004d2e;
+      --marshall-green-bg: #e8f5ec;
+      --covista-green: var(--marshall-green);
+      --covista-green-light: var(--marshall-green-dark);
+      --covista-green-bg: var(--marshall-green-bg);
+      --text-primary: #1a1a1a;
+      --text-secondary: #4a4a4a;
+      --bg-light: #f5f5f5;
+      --white: #ffffff;
+      --border: #d4e5db;
+      --header-utility-h: 0px;
+      --header-nav-h: 64px;
+      --header-h: var(--header-nav-h);
+      --page-chrome-h: 0px;
+      --page-h: calc(100svh - var(--header-h));
+      --landing-h: var(--page-h);
+    }
+    * { box-sizing: border-box; }
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      font-family: 'Source Sans 3', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-primary);
+      background: var(--white);
+      line-height: 1.5;
+    }
+    body { padding-top: var(--header-h); }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .container-wide { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+    /* Marshall-style site header */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .header-utility { display: none; }
+    .header-main {
+      height: var(--header-nav-h);
+      background: var(--white);
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .header-main__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      gap: 20px;
+      min-width: 0;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      text-decoration: none;
+      color: inherit;
+    }
+    .header-brand__text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+      min-width: 0;
+    }
+    .header-brand__text strong {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #111;
+    }
+    .header-brand__text span {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #333;
+    }
+    .header-nav {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .header-nav a {
+      padding: 8px 10px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: #111;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .header-nav a:hover,
+    .header-nav a.active {
+      color: var(--marshall-green);
+      background: var(--marshall-green-bg);
+    }
+    .header-developed-by {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      font-size: 0.72rem;
+      color: #6b7280;
+      white-space: nowrap;
+    }
+    .header-developed-by .logo-pe {
+      height: 28px;
+      max-height: 28px;
+      width: auto;
+      object-fit: contain;
+    }
+    @media (min-width: 1100px) {
+      .header-nav { display: flex; }
+      .header-developed-by { display: flex; }
+      header .hamburger { display: none; }
+    }
+
+    /* Compact page title (non-home sections) */
+    .page-heading {
+      padding: 10px 0 6px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #fff;
+    }
+    .page-heading h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    /* Both logos 25% smaller than original 40px = 30px */
+    .logo-covista {
+      height: 30px;
+      max-height: 30px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+    .logo-pe {
+      height: 30px;
+      max-height: 30px;
+      max-width: 150px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+    .logo-marshall {
+      height: 40px;
+      max-height: 40px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+      flex-shrink: 0;
+    }
+    #covista-text { display: none; font-weight: 700; font-size: 1rem; color: var(--covista-green); line-height: 30px; }
+
+    /* Hamburger */
+    .hamburger {
+      width: 44px;
+      height: 44px;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      border-radius: 6px;
+    }
+    .hamburger:hover { background: var(--marshall-green-bg); }
+    .hamburger span {
+      display: block;
+      height: 2px;
+      background: var(--marshall-green);
+      border-radius: 1px;
+      width: 22px;
+      margin: 0 auto;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .hamburger span { transition: transform 0.2s, opacity 0.2s; }
+
+    /* Menu overlay */
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 98;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+    .menu-overlay.visible { opacity: 1; visibility: visible; }
+    .menu-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 280px;
+      max-width: 85vw;
+      height: 100%;
+      background: var(--white);
+      box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+      z-index: 99;
+      padding: calc(var(--header-h) + 16px) 0 24px;
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+    }
+    .menu-panel.visible { transform: translateX(0); }
+    .menu-panel a {
+      display: block;
+      padding: 12px 24px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border-left: 3px solid transparent;
+    }
+    .menu-panel a:hover, .menu-panel a.active {
+      background: var(--marshall-green-bg);
+      color: var(--marshall-green);
+      border-left-color: var(--marshall-green);
+    }
+    .menu-panel__credit {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 16px 24px 0;
+      margin-top: 8px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 0.72rem;
+      color: #6b7280;
+    }
+    .menu-panel__credit .logo-pe {
+      height: 24px;
+      max-height: 24px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* Pages: stacked sections, scroll through the full dashboard */
+    .page {
+      position: relative;
+      top: auto;
+      left: 0;
+      right: 0;
+      bottom: auto;
+      overflow: visible;
+      display: block;
+      min-height: var(--page-h);
+      scroll-margin-top: var(--header-h);
+      background: var(--white);
+    }
+    .page-inner {
+      min-height: 100%;
+      padding: 32px 0 40px;
+    }
+    /* Viewport-fit pages: one screen per section at 100% zoom */
+    #page-home,
+    #page-placemaking,
+    #page-program-tools,
+    #page-curriculum,
+    #page-methodology {
+      height: var(--page-h);
+      min-height: var(--page-h);
+      max-height: var(--page-h);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    #page-placemaking .page-heading,
+    #page-program-tools .page-heading,
+    #page-curriculum .page-heading,
+    #page-methodology .page-heading {
+      flex-shrink: 0;
+    }
+    #page-placemaking .page-inner {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 12px 0 20px;
+    }
+    #page-program-tools .page-inner,
+    #page-curriculum .page-inner,
+    #page-methodology .page-inner {
+      flex: 1;
+      min-height: 0;
+      padding: 8px 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .page-first-heading { margin-top: 0; }
+    .page h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 16px;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .page h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 20px 0 10px;
+      color: var(--marshall-green);
+    }
+    .page p { margin: 0 0 12px; font-size: 0.9rem; color: var(--text-secondary); }
+    .page a {
+      color: var(--marshall-green);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .page a:hover { text-decoration: underline; }
+
+    /* Home — student & enrollment landing dashboard */
+    #page-home {
+      overflow: hidden;
+      background: #fff;
+    }
+    #page-home .landing-dashboard {
+      flex: 1;
+      min-height: 0;
+      height: auto;
+      max-height: none;
+    }
+    .landing-dashboard {
+      display: grid;
+      grid-template-columns: minmax(320px, 40%) 1fr;
+      height: 100%;
+      max-height: 100%;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .landing-sidebar {
+      background: #fff;
+      border-right: 1px solid #e2e5ea;
+      overflow: hidden;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      min-height: 0;
+      position: relative;
+    }
+    .landing-sidebar__stamp {
+      flex-shrink: 0;
+      padding: 14px 18px 10px;
+      background: #fff;
+      border-bottom: 1px solid #f0f0f0;
+      z-index: 2;
+    }
+    .landing-sidebar__body {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 14px 18px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .example-data-stamp {
+      display: inline-block;
+      padding: 7px 16px;
+      border: 3px double #b45309;
+      border-radius: 4px;
+      color: #b45309;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      transform: rotate(-4deg);
+      opacity: 0.9;
+      background: rgba(255, 251, 235, 0.95);
+      box-shadow: 0 1px 0 rgba(180, 83, 9, 0.15);
+      user-select: none;
+      pointer-events: none;
+    }
+    .landing-filters {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .landing-field label {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+    .landing-field select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      background: #fff;
+      color: var(--text-primary);
+    }
+    .landing-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .landing-metric-card {
+      border: 1px solid #e5e7eb;
+      border-top: 3px solid var(--marshall-green);
+      border-radius: 8px;
+      padding: 12px 10px;
+      background: #fff;
+      min-height: 72px;
+    }
+    .landing-metric-card .label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #6b7280;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+    .landing-metric-card .value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--marshall-green-dark);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+    .landing-metric-card .sub {
+      font-size: 0.72rem;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+    .landing-section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--marshall-green-dark);
+      margin: 0 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid var(--marshall-green-bg);
+    }
+    .landing-charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .landing-chart-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+      min-height: 160px;
+    }
+    .landing-chart-card h4 {
+      margin: 0 0 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--marshall-green);
+    }
+    .landing-chart-wrap {
+      position: relative;
+      height: 120px;
+    }
+    .landing-demographics-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .landing-slider-row label {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+    .landing-slider-row input[type="range"] {
+      width: 100%;
+      accent-color: var(--marshall-green);
+    }
+    .landing-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    .landing-table th,
+    .landing-table td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .landing-table th {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--marshall-green-dark);
+      background: var(--marshall-green-bg);
+    }
+    .landing-table td.num { font-variant-numeric: tabular-nums; }
+    .landing-map-panel {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+      background: #e8eaed;
+      isolation: isolate;
+    }
+    #marshall-map {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .map-panel {
+      z-index: 5;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      width: min(280px, calc(100% - 28px));
+      overflow: hidden;
+      position: absolute;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+    body.map-overlays-hidden .map-panel {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .map-panel__toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 14px;
+      border: none;
+      background: var(--marshall-green-bg);
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+    }
+    .map-panel__toggle:hover { background: #d4eddc; }
+    .map-panel__title {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--marshall-green-dark);
+    }
+    .map-panel__chevron {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      line-height: 1;
+      transition: transform 0.2s ease;
+    }
+    .map-panel.collapsed .map-panel__chevron { transform: rotate(-90deg); }
+    .map-panel__body {
+      padding: 12px 14px 14px;
+      font-size: 0.82rem;
+    }
+    .map-panel.collapsed .map-panel__body { display: none; }
+    .map-layers-card {
+      top: 14px;
+      right: 14px;
+    }
+    .map-layers-card fieldset {
+      border: none;
+      margin: 0 0 12px;
+      padding: 0;
+    }
+    .map-layers-card fieldset legend {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 8px;
+    }
+    .map-layers-card label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      color: #374151;
+    }
+    .map-layers-card input { accent-color: var(--marshall-green); }
+    .map-basemap-btns {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .map-basemap-btns button {
+      padding: 5px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: #fff;
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .map-basemap-btns button.active {
+      background: var(--marshall-green);
+      border-color: var(--marshall-green);
+      color: #fff;
+    }
+    .site-boundary-editor {
+      margin-top: 12px;
+      padding-top: 0;
+      border-top: 1px solid #e5e7eb;
+    }
+    .site-boundary-editor .map-panel__toggle {
+      padding: 8px 0;
+      background: transparent;
+    }
+    .site-boundary-editor .map-panel__toggle:hover { background: transparent; }
+    .site-boundary-editor .map-panel__body {
+      padding: 0 0 4px;
+    }
+    .site-boundary-editor.collapsed .map-panel__body { display: none; }
+    .site-boundary-editor.collapsed .map-panel__chevron { transform: rotate(-90deg); }
+    .map-edit-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .map-edit-btns button {
+      padding: 5px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: #fff;
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .map-edit-btns button:hover { background: #f3f4f6; }
+    .map-edit-btns button.active {
+      background: var(--marshall-green);
+      border-color: var(--marshall-green);
+      color: #fff;
+    }
+    .map-edit-btns button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .map-edit-hint {
+      margin: 0 0 8px;
+      font-size: 0.72rem;
+      color: #6b7280;
+      line-height: 1.4;
+    }
+    #site-coords-export {
+      width: 100%;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.68rem;
+      line-height: 1.35;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 8px;
+      resize: vertical;
+      min-height: 88px;
+      margin-bottom: 6px;
+      box-sizing: border-box;
+    }
+    #copy-site-coords-btn {
+      width: 100%;
+      padding: 6px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: #f9fafb;
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    #copy-site-coords-btn:hover { background: #f3f4f6; }
+    .map-legend {
+      bottom: 14px;
+      right: 14px;
+    }
+    .map-legend .map-panel__body {
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-top: 8px;
+    }
+    .map-legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+      font-size: 0.75rem;
+      color: #374151;
+    }
+    .map-legend-row:last-child { margin-bottom: 0; }
+    .map-legend-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.15);
+      flex-shrink: 0;
+    }
+    .map-legend-swatch--site {
+      border-radius: 2px;
+      background: rgba(13, 92, 46, 0.22);
+      border: 2px dashed #111827;
+    }
+    .map-legend-swatch--idea {
+      border-radius: 2px;
+      background: rgba(234, 88, 12, 0.28);
+      border: 2px dashed #111827;
+    }
+    .map-legend-swatch--marshall-campus {
+      border-radius: 2px;
+      background: rgba(37, 99, 235, 0.18);
+      border: 2px dashed #1e3a8a;
+    }
+    .mapboxgl-popup-content {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 0.82rem;
+      padding: 12px 14px;
+      border-radius: 8px;
+      max-width: 260px;
+    }
+    .mapboxgl-popup-content h3 {
+      margin: 0 0 4px;
+      font-size: 0.9rem;
+      color: #111827;
+    }
+    .mapboxgl-popup-content .cat {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--marshall-green);
+      margin-bottom: 6px;
+    }
+    .mapboxgl-popup-content p {
+      margin: 0;
+      color: #4b5563;
+      line-height: 1.45;
+    }
+    @media (max-width: 960px) {
+      .landing-dashboard { grid-template-columns: 1fr; grid-template-rows: 45% 55%; }
+      .landing-sidebar { border-right: none; border-bottom: 1px solid #e2e5ea; }
+      .landing-metrics { grid-template-columns: 1fr; }
+      .landing-charts { grid-template-columns: 1fr; }
+    }
+
+    /* Tables */
+    .program-table, .benchmark-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .program-table th, .program-table td,
+    .benchmark-table th, .benchmark-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    .program-table th, .benchmark-table th { background: var(--covista-green-bg); color: var(--covista-green); font-weight: 600; }
+    .program-table td.num, .benchmark-table td.num { text-align: left; font-variant-numeric: tabular-nums; }
+    .highlight { background: var(--covista-green-bg); }
+
+    /* Schemes */
+    .schemes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+    @media (max-width: 900px) { .schemes { grid-template-columns: 1fr; } }
+    .scheme-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--white);
+    }
+    .scheme-card h4 { margin: 0; padding: 12px; background: var(--covista-green-bg); color: var(--covista-green); font-size: 0.95rem; }
+    .scheme-card .body { padding: 12px; font-size: 0.85rem; color: var(--text-secondary); }
+    .scheme-diagram {
+      height: 80px;
+      background: var(--bg-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+    .scheme-comparison {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 900px) { .scheme-comparison { grid-template-columns: 1fr; } }
+    .scheme-table-col {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--white);
+    }
+    .scheme-table-col h4 {
+      margin: 0;
+      padding: 10px 12px;
+      background: var(--covista-green-bg);
+      color: var(--covista-green);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .scheme-table-col table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .scheme-table-col th, .scheme-table-col td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+    .scheme-table-col th { font-weight: 500; color: var(--text-secondary); }
+    .scheme-table-col td.num { text-align: left; font-variant-numeric: tabular-nums; font-weight: 500; color: var(--text-primary); }
+    .scheme-card img.scheme-png {
+      width: 100%;
+      height: auto;
+      min-height: 100px;
+      max-height: 180px;
+      object-fit: contain;
+      background: var(--bg-light);
+      border-top: 1px solid var(--border);
+      display: block;
+      cursor: pointer;
+    }
+    .img-popup { cursor: pointer; }
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .popup-overlay.visible { display: flex; }
+    .popup-overlay .popup-content { display: flex; align-items: center; justify-content: center; gap: 24px; max-width: 95%; max-height: 95%; }
+    .popup-overlay .popup-content img { max-width: 60%; max-height: 90vh; object-fit: contain; }
+    .popup-overlay:not(.has-metrics) .popup-content img { max-width: 95%; }
+    .popup-overlay .popup-scheme-metrics { display: none; background: var(--white); border-radius: 8px; padding: 20px; min-width: 260px; max-width: 320px; max-height: 90vh; overflow-y: auto; }
+    .popup-overlay.has-metrics .popup-scheme-metrics { display: block; }
+    .popup-overlay.has-metrics .popup-content { flex-direction: row; }
+    .popup-scheme-metrics h4 { margin: 0 0 12px; color: var(--covista-green); font-size: 1rem; }
+    .popup-scheme-metrics table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .popup-scheme-metrics th, .popup-scheme-metrics td { padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+    .popup-scheme-metrics td.num { text-align: left; font-variant-numeric: tabular-nums; }
+    .popup-overlay .popup-close { position: absolute; top: 16px; right: 20px; color: #fff; font-size: 28px; cursor: pointer; line-height: 1; z-index: 1; }
+    .page-img { max-width: 100%; height: auto; border-radius: 8px; margin: 12px 0; border: 1px solid var(--border); }
+    .page-infographic-inner {
+      padding: 0;
+      max-width: 1280px;
+      width: 100%;
+      height: 100%;
+    }
+    .page-infographic-img {
+      display: block;
+      width: auto;
+      max-width: 100%;
+      max-height: 100%;
+      height: auto;
+      margin: 0 auto;
+      border: none;
+      border-radius: 4px;
+      object-fit: contain;
+      cursor: zoom-in;
+    }
+    .impact-three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 24px; align-items: start; }
+    @media (max-width: 900px) { .impact-three { grid-template-columns: 1fr; } }
+    .impact-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--white);
+    }
+    .impact-card h4 { margin: 0; padding: 12px; background: var(--covista-green-bg); color: var(--covista-green); font-size: 0.9rem; font-weight: 600; }
+    .impact-card .impact-img { width: 100%; height: auto; max-height: 160px; object-fit: cover; display: block; background: var(--bg-light); }
+    .impact-card .impact-body { padding: 14px; font-size: 0.85rem; }
+    .impact-card .impact-body strong { display: block; margin: 10px 0 6px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--covista-green); }
+    .impact-card .impact-body ul { margin: 0 0 12px; padding-left: 18px; color: var(--text-secondary); line-height: 1.5; }
+    .schemes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-top: 20px; }
+    .schemes-grid .thumb-wrap { text-align: center; }
+    .schemes-grid .thumb-wrap img { width: 100%; height: auto; max-height: 140px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-light); }
+    .schemes-grid .thumb-wrap span { display: block; font-size: 0.8rem; color: var(--covista-green); font-weight: 500; margin-top: 6px; }
+    .dashboard-intro { max-width: 720px; margin-top: 16px; }
+    .dashboard-intro p { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; }
+    .home-site-two { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 16px; align-items: start; }
+    .home-site-item { text-align: center; }
+    .home-site-item img { width: 100%; height: auto; max-height: 380px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-light); cursor: pointer; }
+    .home-site-item span { display: block; font-size: 0.9rem; color: var(--covista-green); font-weight: 500; margin-top: 8px; }
+    @media (max-width: 700px) { .home-site-two { grid-template-columns: 1fr; } }
+
+    /* Methodology grid */
+    .methodology-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px; }
+    @media (max-width: 600px) { .methodology-grid { grid-template-columns: 1fr; } }
+    .programming-three { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (max-width: 900px) { .programming-three { grid-template-columns: 1fr; } }
+    .method-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px;
+    }
+    .method-card h4 { margin: 0 0 6px; font-size: 0.9rem; color: var(--covista-green); }
+    .method-card p { margin: 0; font-size: 0.82rem; color: var(--text-secondary); }
+    .method-card.tool-panel .form-row { margin-bottom: 8px; }
+    .method-card.tool-panel .outputs { margin-top: 10px; }
+    .mock-table { width: 100%; margin-top: 8px; font-size: 0.8rem; border-collapse: collapse; }
+    .student-enrollment-caption { caption-side: top; font-size: 1.05rem; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; text-align: left; padding: 0; }
+    .mock-table thead th { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--border); font-weight: 600; }
+    .mock-table td { padding: 4px 8px; border-bottom: 1px solid var(--border); }
+    .mock-table td.num { text-align: left; font-variant-numeric: tabular-nums; }
+    .mock-table-hierarchy tr.sub td:first-child { padding-left: 20px; }
+    .mock-table-hierarchy tr.sub2 td:first-child { padding-left: 40px; }
+    .mock-table-hierarchy tr.sub3 td:first-child { padding-left: 60px; }
+    .mock-table-hierarchy tr.sub4 td:first-child { padding-left: 80px; }
+    .mock-table-hierarchy tr.group-header { cursor: pointer; }
+    .mock-table-hierarchy tr.group-header:hover { background: var(--covista-green-bg); }
+    .mock-table-hierarchy tr.group-header .toggle-icon { display: inline-block; width: 1em; margin-right: 6px; font-size: 0.75em; vertical-align: 0.05em; }
+    .mock-table-hierarchy tr.group-header.collapsed .toggle-icon::before { content: '▶'; }
+    .mock-table-hierarchy tr.group-header.expanded .toggle-icon::before { content: '▼'; }
+    .mock-table-hierarchy tr.curriculum-table-header td { font-weight: 600; color: var(--covista-green); background: var(--covista-green-bg); }
+    .mock-table-hierarchy tr.group-child { display: none !important; }
+    .mock-table-hierarchy tr.group-child.is-visible { display: table-row !important; }
+    .grossing-slider-wrap { display: flex; align-items: center; gap: 12px; margin: 8px 0; flex-wrap: wrap; }
+    .grossing-slider-wrap label { font-size: 0.85rem; white-space: nowrap; }
+    .grossing-slider-wrap input[type="range"] { width: 120px; min-width: 120px; }
+    .grossing-slider-wrap .grossing-value { font-weight: 600; color: var(--covista-green); min-width: 4ch; }
+    .cost-options-container { font-family: inherit; font-size: 0.85rem; }
+    .cost-options-row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .cost-options-row .cost-vat-checkbox-label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem; white-space: nowrap; margin: 0; }
+    .cost-options-row .cost-vat-checkbox-label input[type="checkbox"] { margin: 0; vertical-align: middle; }
+    .cost-options-row .grossing-slider-wrap { margin: 0; }
+    .cost-breakdown-table tr.cost-target-row:first-of-type td { border-top: 1px solid var(--border); padding-top: 10px; }
+    .cost-breakdown-table tr.cost-subtotal-row td,
+    .cost-breakdown-table tr.cost-total-row td { background: var(--covista-green-bg); color: var(--covista-green); }
+    .cost-breakdown-table tr.cost-subtotal-row { cursor: pointer; }
+    .cost-breakdown-table tr.cost-subtotal-row:hover td { background: var(--covista-green-bg); filter: brightness(0.97); }
+    .cost-breakdown-table .cost-collapse-icon { display: inline-block; width: 1em; margin-right: 6px; font-size: 0.7em; vertical-align: 0.05em; }
+    .cost-breakdown-table tr.cost-subtotal-row.cost-collapsed .cost-collapse-icon { transform: rotate(-90deg); }
+    .cost-breakdown-table tr[data-cost-collapse].cost-collapse-hidden { display: none; }
+    .cost-breakdown-table tr.cost-breakdown-subrow td { font-size: 0.85em; }
+    .cost-breakdown-table tr.cost-breakdown-subrow td:first-child { padding-left: 3em; }
+    .cost-breakdown-table .cost-target-inline { font-weight: 500; opacity: 0.9; margin-left: 8px; }
+    .cost-breakdown-table tr.cost-total-row.cost-over-target td { color: #c53030; }
+    .cost-breakdown-table tr.cost-total-row.cost-over-target td .cost-target-inline { color: var(--covista-green); }
+    .overview-students-housed-input { width: 100%; max-width: 5.5rem; box-sizing: border-box; padding: 2px 6px; font-size: inherit; font-variant-numeric: tabular-nums; }
+    .mock-table.benchmark-in-card thead th { background: var(--covista-green-bg); color: var(--covista-green); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border); font-size: 0.75rem; }
+    .mock-table.benchmark-in-card td { font-size: 0.78rem; }
+    .calc-open-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: var(--covista-green);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .calc-open-btn:hover { background: var(--covista-green-light); }
+    .program-tools-page-inner { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+    .program-tools-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 400px);
+      gap: 28px;
+      align-items: start;
+      min-height: calc(100vh - var(--header-h) - 100px);
+      overflow: hidden;
+    }
+    .program-tools-main { min-width: 0; min-height: calc(100vh - var(--header-h) - 100px); overflow: hidden; }
+    .program-tools-right {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      align-self: stretch;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .program-tools-right-sticky {
+      position: sticky;
+      top: 12px;
+      align-self: flex-start;
+      width: 100%;
+      max-width: 100%;
+      z-index: 2;
+      background: var(--white);
+      padding-bottom: 12px;
+      border-radius: 0 0 8px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .program-tools-map-wrap {
+      position: relative;
+      width: 100%;
+      flex-shrink: 0;
+    }
+    .calc-open-btn--on-map {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 10;
+      pointer-events: auto;
+    }
+    .program-right-summary { margin-top: 16px; min-width: 0; }
+    .program-right-panel h4 { margin: 0 0 8px; font-size: 1.05rem; color: var(--covista-green); }
+    .program-right-panel p { margin: 0 0 10px; font-size: 0.9rem; color: var(--text-secondary); }
+    .program-right-panel .program-table { margin-top: 0; }
+    .program-tools-map-inner {
+      position: relative;
+      width: 100%;
+      max-height: 82vh;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      isolation: isolate;
+    }
+    .program-tools-map-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 82vh;
+      object-fit: contain;
+      vertical-align: middle;
+      max-width: 100%;
+    }
+    .program-tools-map-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(
+        circle at var(--hl-x, 50%) var(--hl-y, 50%),
+        transparent var(--hl-r, 25%),
+        rgba(0, 0, 0, 0.52) var(--hl-r, 25%)
+      );
+      opacity: var(--hl-show, 0);
+      transition: opacity 0.3s ease;
+    }
+    @media (max-width: 1100px) {
+      .program-tools-layout { grid-template-columns: 1fr; min-height: 0; }
+      .program-tools-main { min-height: 0; }
+      .program-tools-right { max-width: 100%; }
+      .program-tools-right-sticky { position: relative; top: 0; max-width: 520px; }
+    }
+    /* Cost Estimating: same tab/panel layout and map as Program & Tools */
+    .cost-estimating-page-inner { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+    .cost-estimating-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 400px); gap: 28px; align-items: start; min-height: calc(100vh - var(--header-h) - 100px); overflow: hidden; }
+    .cost-estimating-main { min-width: 0; min-height: calc(100vh - var(--header-h) - 100px); overflow: hidden; }
+    .cost-estimating-right {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      align-self: stretch;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .cost-estimating-right-sticky {
+      position: sticky;
+      top: 12px;
+      align-self: flex-start;
+      width: 100%;
+      max-width: 100%;
+      z-index: 2;
+      background: var(--white);
+      padding-bottom: 12px;
+      border-radius: 0 0 8px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .cost-right-summary { margin-top: 16px; min-width: 0; }
+    .cost-right-panel .program-table { margin-top: 0; }
+    .cost-detail-tabs { display: flex; gap: 0; margin: 0 0 4px; border-bottom: 2px solid var(--border); flex-wrap: wrap; }
+    .cost-detail-tabs .cost-detail-tabs__btn { margin: 0; }
+    .cost-detail-tabs__btn { padding: 12px 20px; font-size: 0.95rem; font-weight: 600; color: var(--text-secondary); background: transparent; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; cursor: pointer; font-family: inherit; }
+    .cost-detail-tabs__btn:hover { color: var(--covista-green); }
+    .cost-detail-tabs__btn.active { color: var(--covista-green); border-bottom-color: var(--covista-green); }
+    .cost-detail-panel { display: none; padding: 0; }
+    .cost-detail-panel.active { display: block !important; }
+    .cost-detail-panel h3 { font-size: 1.05rem; margin: 12px 0 8px; }
+    .cost-detail-panel p { margin: 0 0 12px; font-size: 0.9rem; color: var(--text-secondary); }
+    .cost-estimating-mid-tables { margin-top: 20px; }
+    .cost-estimating-mid-tables .program-table { margin-top: 12px; }
+    .cost-estimating-mid-tables .program-table:first-child { margin-top: 0; }
+    .cost-estimating-main .cost-vat-col { display: none; }
+    body.cost-show-vat .cost-estimating-main .cost-vat-col { display: table-cell; }
+    @media (max-width: 1100px) {
+      .cost-estimating-layout { grid-template-columns: 1fr; min-height: 0; }
+      .cost-estimating-main { min-height: 0; }
+      .cost-estimating-right { max-width: 100%; }
+      .cost-estimating-right-sticky { position: relative; top: 0; max-width: 520px; }
+    }
+    .program-tools-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .program-tools-top h2 { margin: 0; }
+    .interactive-tools-block {
+      text-align: right;
+      max-width: 320px;
+    }
+    .interactive-tools-block h3 { margin: 0 0 8px; font-size: 1.05rem; }
+    .interactive-tools-block p { margin: 0 0 10px; font-size: 0.88rem; }
+    @media (max-width: 700px) {
+      .program-tools-top { flex-direction: column; }
+      .interactive-tools-block { text-align: left; max-width: none; }
+    }
+
+    /* Program detail tabs: full-width row above map/content, line continues under */
+    .program-detail-tabs {
+      display: flex;
+      gap: 0;
+      margin: 0 0 4px;
+      border-bottom: 2px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .program-detail-tabs__btn {
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .program-detail-tabs__btn:hover { color: var(--covista-green); }
+    .program-detail-tabs__btn.active {
+      color: var(--covista-green);
+      border-bottom-color: var(--covista-green);
+    }
+    .program-detail-panel {
+      display: none;
+      padding: 24px 0 0;
+      animation: programPanelFade 0.2s ease;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .program-detail-panel.active { display: block !important; }
+    @keyframes programPanelFade { from { opacity: 0; } to { opacity: 1; } }
+    .program-detail-panel h4 { margin: 0 0 12px; font-size: 1.05rem; color: var(--covista-green); }
+    .program-detail-panel .program-table { margin-top: 0; }
+    .program-detail-panel p { margin: 0 0 12px; font-size: 0.9rem; color: var(--text-secondary); }
+
+    /* Placemaking framework cards */
+    .placemaking-intro { max-width: 720px; margin-bottom: 24px; }
+    .placemaking-intro p { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; margin: 0 0 10px; }
+    .placemaking-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 20px; }
+    .placemaking-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--white);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .placemaking-card__header {
+      padding: 14px 18px;
+      background: var(--covista-green-bg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .placemaking-card__num { font-size: 0.85rem; font-weight: 700; color: var(--covista-green); }
+    .placemaking-card__title { margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--covista-green); }
+    .placemaking-card__body { padding: 18px; font-size: 0.9rem; }
+    .placemaking-card__desc { color: var(--text-primary); line-height: 1.55; margin: 0 0 14px; }
+    .placemaking-card__label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--covista-green);
+      font-weight: 600;
+      margin: 10px 0 6px;
+    }
+    .placemaking-card__label:first-of-type { margin-top: 0; }
+    .placemaking-card ul { margin: 0 0 8px; padding-left: 20px; color: var(--text-secondary); line-height: 1.5; }
+    .placemaking-card__metric {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: var(--bg-light);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--covista-green);
+    }
+
+    /* Draggable, resizable calculator */
+    .calc-panel {
+      position: fixed;
+      width: 340px;
+      height: 520px;
+      min-width: 280px;
+      min-height: 320px;
+      max-width: 95vw;
+      max-height: 90vh;
+      background: var(--white);
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      z-index: 999;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      resize: none;
+    }
+    .calc-panel.visible { display: flex; }
+    .calc-panel .calc-drag {
+      position: relative;
+      padding: 10px 40px 10px 14px;
+      background: var(--text-primary);
+      color: var(--white);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: move;
+      user-select: none;
+    }
+    .calc-panel .calc-close-x {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      line-height: 1;
+      color: var(--white);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      border-radius: 4px;
+      padding: 0;
+    }
+    .calc-panel .calc-close-x:hover { background: rgba(255,255,255,0.25); }
+    .calc-panel .calc-body { padding: 14px; overflow-y: auto; flex: 1; min-height: 0; }
+    .calc-section { margin-bottom: 14px; border-radius: 8px; padding: 12px; border: 1px solid transparent; }
+    .calc-section.tool-sqf { background: #e8f4ed; border-left: 4px solid var(--covista-green); }
+    .calc-section.tool-students { background: #e8f0f9; border-left: 4px solid #1a5fb4; }
+    .calc-section.tool-cost { background: #fef6e6; border-left: 4px solid #c64600; }
+    .calc-section h4 { margin: 0 0 8px; font-size: 0.9rem; }
+    .calc-section.tool-sqf h4 { color: var(--covista-green); }
+    .calc-section.tool-students h4 { color: #1a5fb4; }
+    .calc-section.tool-cost h4 { color: #c64600; }
+    .calc-section .form-row { margin-bottom: 6px; }
+    .calc-section .outputs { margin-top: 8px; }
+    .calc-section .output-box .value { font-size: 1rem; }
+    .calc-panel .calc-resize {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 20px;
+      height: 20px;
+      cursor: nwse-resize;
+      background: var(--border);
+      border-radius: 4px 0 0 0;
+      z-index: 2;
+    }
+    .calc-panel .calc-resize:hover { background: var(--text-secondary); }
+    .calc-panel .calc-close { padding: 8px; text-align: center; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; border-top: 1px solid var(--border); }
+    .calc-panel .calc-close:hover { background: var(--bg-light); }
+
+    /* Interactive tools */
+    .tool-panel {
+      background: var(--covista-green-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
+    }
+    .tool-panel h3 { margin: 0 0 12px; font-size: 1rem; color: var(--covista-green); }
+    .form-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; margin-bottom: 12px; }
+    .field { display: flex; flex-direction: column; gap: 2px; }
+    .field label { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); }
+    .field input {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      width: 120px;
+    }
+    .outputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 12px; }
+    .output-box {
+      background: var(--white);
+      border-radius: 6px;
+      padding: 12px;
+      border-left: 4px solid var(--covista-green);
+    }
+    .output-box .label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em; }
+    .output-box .value { font-size: 1.1rem; font-weight: 600; color: var(--covista-green); }
+
+    /* Charts */
+    .charts-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 20px; align-items: start; min-width: 0; }
+    @media (max-width: 800px) { .charts-row { grid-template-columns: 1fr; } }
+    .sf-total-include-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+    .sf-total-include-wrap .sf-total-include-label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; white-space: nowrap; }
+    .chart-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      min-width: 0;
+      overflow: hidden;
+    }
+    .chart-card h4 { margin: 0 0 12px; font-size: 0.95rem; color: var(--covista-green); font-weight: 600; }
+    .chart-wrap { position: relative; height: 280px; width: 100%; min-width: 0; min-height: 200px; overflow: hidden; }
+    .chart-wrap.chart-tall { height: 320px; }
+
+    /* Curriculum Overview page (data-driven timeline) */
+    .curriculum-program {
+      --curriculum-navy: var(--marshall-green-dark);
+      --curriculum-navy-10: var(--marshall-green-bg);
+      --curriculum-orange: #ff7a00;
+      --curriculum-orange-10: #fde6d1;
+      --curriculum-gray-5: #f3f6f9;
+      --curriculum-text: #12202a;
+      --curriculum-muted: #4b5b67;
+      --curriculum-radius: 10px;
+    }
+    .curriculum-program {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 48px;
+      align-items: start;
+      padding: 0;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .curriculum-program .program__title {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      line-height: 1.05;
+      margin: 0 0 16px;
+      color: var(--curriculum-text);
+    }
+    .curriculum-program .program__p {
+      color: var(--curriculum-muted);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin: 0 0 14px;
+    }
+    .curriculum-program .program__p--small { font-size: 0.9rem; }
+    .curriculum-program .program__list {
+      margin: 0 0 14px;
+      padding-left: 1.25rem;
+      color: var(--curriculum-muted);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    .curriculum-program .program__list li { margin-bottom: 0.35em; }
+    .curriculum-program .program__link {
+      color: var(--curriculum-navy);
+      text-decoration: underline;
+    }
+    .curriculum-program .program__link:hover { text-decoration: none; }
+    .curriculum-module-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 24px;
+      margin: 0 0 14px;
+    }
+    .curriculum-year-block {
+      background: var(--curriculum-gray-5);
+      border-radius: var(--curriculum-radius);
+      padding: 16px 18px;
+    }
+    .curriculum-year-block__title {
+      font-weight: 700;
+      color: var(--curriculum-text);
+      margin: 0 0 12px;
+      font-size: 1rem;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--curriculum-muted);
+    }
+    .curriculum-year-block--y1 .curriculum-year-block__title { border-bottom-color: var(--curriculum-navy); color: var(--curriculum-navy); }
+    .curriculum-year-block--y2 .curriculum-year-block__title { border-bottom-color: var(--curriculum-orange); color: var(--curriculum-orange); }
+    .curriculum-module-list { margin: 0; padding-left: 0; list-style: none; }
+    .curriculum-module-list li {
+      font-size: 0.9rem;
+      color: var(--curriculum-muted);
+      line-height: 1.5;
+      margin-bottom: 10px;
+      padding-left: 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .curriculum-module-list li .mod-num {
+      flex-shrink: 0;
+      font-weight: 700;
+      color: var(--curriculum-text);
+      font-size: 0.8rem;
+    }
+    .curriculum-year-block--y1 .curriculum-module-list li .mod-num { color: var(--curriculum-navy); }
+    .curriculum-year-block--y2 .curriculum-module-list li .mod-num { color: var(--curriculum-orange); }
+    .curriculum-module-list-by-year { margin: 0; padding-left: 0; list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 24px; }
+    .curriculum-module-item { font-size: 0.88rem; line-height: 1.4; padding: 8px 12px; border-radius: 6px; display: flex; align-items: flex-start; gap: 8px; }
+    .curriculum-module-item__num { font-weight: 700; flex-shrink: 0; }
+    .curriculum-module-item--y1 { background: var(--curriculum-navy-10); color: var(--curriculum-navy); }
+    .curriculum-module-item--y1 .curriculum-module-item__num { color: var(--curriculum-navy); }
+    .curriculum-module-item--y2 { background: var(--curriculum-orange-10); color: var(--curriculum-text); }
+    .curriculum-module-item--y2 .curriculum-module-item__num { color: var(--curriculum-orange); }
+    @media (max-width: 600px) { .curriculum-module-grid { grid-template-columns: 1fr; } .curriculum-module-list-by-year { grid-template-columns: 1fr; } }
+
+    /* Curriculum proposal dashboard: tiles + cards */
+    .curriculum-dashboard { margin-bottom: 32px; }
+    .curriculum-tiles {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) {
+      .curriculum-tiles { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .curriculum-tiles { grid-template-columns: 1fr; }
+    }
+    .curriculum-tile {
+      background: var(--curriculum-gray-5);
+      border-radius: var(--curriculum-radius);
+      padding: 16px 18px;
+      border: 1px solid transparent;
+    }
+    .curriculum-tile__label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--curriculum-muted);
+      margin-bottom: 6px;
+    }
+    .curriculum-tile__value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--curriculum-text);
+      line-height: 1.35;
+    }
+    .curriculum-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 700px) {
+      .curriculum-cards { grid-template-columns: 1fr; }
+    }
+    .curriculum-card {
+      background: var(--white);
+      border-radius: var(--curriculum-radius);
+      border: 1px solid var(--curriculum-gray-5);
+      padding: 20px 22px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .curriculum-card__title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--curriculum-text);
+      margin: 0 0 14px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--curriculum-navy-10);
+    }
+    .curriculum-modules-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 20px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .curriculum-modules-grid li {
+      font-size: 0.9rem;
+      color: var(--curriculum-muted);
+      line-height: 1.45;
+      padding-left: 0;
+    }
+    @media (max-width: 500px) {
+      .curriculum-modules-grid { grid-template-columns: 1fr; }
+    }
+    .curriculum-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .curriculum-pills li {
+      display: inline-block;
+      background: var(--curriculum-navy-10);
+      color: var(--curriculum-navy);
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 999px;
+    }
+
+    .curriculum-program-img-wrap {
+      max-width: 1100px;
+      margin: 16px auto 0;
+      padding: 0 24px;
+    }
+    .curriculum-program-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: var(--curriculum-radius);
+      border: 1px solid var(--curriculum-gray-5);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .curriculum-program .timeline__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .curriculum-program .timeline__h1 { font-size: 1.5rem; font-weight: 700; color: var(--curriculum-text); }
+    .curriculum-program .timeline__h2 { font-size: 1rem; font-weight: 600; color: var(--curriculum-text); opacity: 0.9; }
+    .curriculum-program .timeline__years {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      min-width: 200px;
+    }
+    .curriculum-program .timeline__year {
+      color: #fff;
+      font-weight: 700;
+      text-align: center;
+      padding: 14px 12px;
+      border-radius: var(--curriculum-radius);
+    }
+    .curriculum-program .timeline__year--y1 { background: var(--curriculum-navy); }
+    .curriculum-program .timeline__year--y2 { background: var(--curriculum-orange); }
+    .curriculum-program .timeline__grid {
+      display: grid;
+      grid-template-columns: 140px 1fr 1fr;
+      gap: 16px 12px;
+      align-items: stretch;
+    }
+    .curriculum-program .season {
+      background: var(--curriculum-gray-5);
+      border-radius: var(--curriculum-radius);
+      padding: 22px 14px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .curriculum-program .season__name { font-weight: 700; color: var(--curriculum-text); }
+    .curriculum-program .season__weeks { color: var(--curriculum-muted); margin-top: 6px; font-size: 0.85rem; }
+    .curriculum-program .yearcol {
+      border-radius: var(--curriculum-radius);
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      justify-content: center;
+    }
+    .curriculum-program .yearcol--y1 { background: var(--curriculum-navy-10); }
+    .curriculum-program .yearcol--y2 { background: var(--curriculum-orange-10); }
+    .curriculum-program .yearcol--empty { min-height: 110px; }
+    .curriculum-program .pill {
+      border-radius: 8px;
+      padding: 12px 0;
+      text-align: center;
+      font-weight: 800;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .curriculum-program .pill:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .curriculum-program .pill:active { transform: translateY(0); }
+    .curriculum-program .pill--y1 { background: var(--curriculum-navy); }
+    .curriculum-program .pill--y2 { background: var(--curriculum-orange); }
+    @media (max-width: 900px) {
+      .curriculum-program { grid-template-columns: 1fr; }
+      .curriculum-program .timeline__years { min-width: 0; width: 100%; }
+      .curriculum-program .timeline__grid { grid-template-columns: 100px 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .curriculum-program .timeline__grid { grid-template-columns: 1fr; }
+      .curriculum-program .timeline__grid .season { grid-column: 1; }
+      .curriculum-program .timeline__grid .yearcol { grid-column: 1; }
+    }
+
+    /* Curriculum Overview — clean single-page layout */
+    .curriculum-overview { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+    .curriculum-overview .curriculum-program { display: block; }
+    .curriculum-overview__section { margin-bottom: 20px; }
+    .curriculum-overview__section:last-child { margin-bottom: 0; }
+    .curriculum-overview__heading { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--curriculum-muted); margin: 0 0 8px; }
+    .curriculum-structure-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .curriculum-structure-table th { text-align: left; font-weight: 600; color: var(--curriculum-text); padding: 6px 10px; border-bottom: 1px solid var(--curriculum-gray-5); }
+    .curriculum-structure-table td { padding: 6px 10px; border-bottom: 1px solid var(--curriculum-gray-5); color: var(--curriculum-muted); }
+    .curriculum-structure-table tr:last-child th,
+    .curriculum-structure-table tr:last-child td { border-bottom: none; }
+    .curriculum-structure-table .metric-icon { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 6px; margin-right: 10px; vertical-align: middle; }
+    .curriculum-structure-table .metric-icon--length { background: var(--curriculum-navy-10); color: var(--curriculum-navy); }
+    .curriculum-structure-table .metric-icon--location { background: var(--curriculum-orange-10); color: var(--curriculum-orange); }
+    .curriculum-structure-table .metric-icon--model { background: var(--curriculum-navy-10); color: var(--curriculum-navy); }
+    .curriculum-structure-table--twocol { table-layout: fixed; }
+    .curriculum-structure-table--twocol th:nth-child(3) { border-left: 1px solid var(--border); }
+    .curriculum-structure-table--twocol th,
+    .curriculum-structure-table--twocol td { width: 25%; }
+    .curriculum-modules-blocks { display: flex; flex-direction: column; gap: 16px; }
+    .curriculum-modules-block-group { background: var(--curriculum-gray-5); border-radius: 8px; padding: 14px 18px; }
+    .curriculum-modules-block-group__title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--curriculum-navy); margin: 0 0 10px; }
+    .curriculum-modules-block-group ul { margin: 0; padding-left: 1.2rem; list-style: none; }
+    .curriculum-modules-block-group li { font-size: 0.88rem; color: var(--curriculum-text); line-height: 1.6; margin-bottom: 4px; position: relative; padding-left: 0.5rem; }
+    .curriculum-modules-block-group li::before { content: '•'; position: absolute; left: -0.6rem; color: var(--curriculum-muted); }
+    .curriculum-calendar { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 600px) { .curriculum-calendar { grid-template-columns: 1fr; } }
+    .curriculum-calendar-year { background: var(--covista-green-bg); border-radius: 8px; padding: 10px 14px; }
+    .curriculum-calendar-year__title { font-size: 1rem; font-weight: 700; color: var(--curriculum-text); margin: 0 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--curriculum-muted); }
+    .curriculum-calendar-year--y1 .curriculum-calendar-year__title { border-bottom-color: var(--curriculum-navy); color: var(--curriculum-navy); }
+    .curriculum-calendar-year--y2 .curriculum-calendar-year__title { border-bottom-color: var(--curriculum-orange); color: var(--curriculum-orange); }
+    .curriculum-calendar-season { margin-bottom: 10px; }
+    .curriculum-calendar-season:last-child { margin-bottom: 0; }
+    .curriculum-calendar-season__name { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--curriculum-muted); margin-bottom: 4px; }
+    .curriculum-calendar-season ul { margin: 0; padding-left: 0; list-style: none; }
+    .curriculum-calendar-season li { font-size: 0.88rem; color: var(--curriculum-text); margin-bottom: 4px; line-height: 1.4; }
+    .curriculum-calendar-mod-num { display: inline-block; font-size: 0.72rem; font-weight: 700; color: var(--curriculum-muted); min-width: 4.5em; margin-right: 6px; }
+    .curriculum-calendar-year--y1 .curriculum-calendar-mod-num { color: var(--curriculum-navy); }
+    .curriculum-calendar-year--y2 .curriculum-calendar-mod-num { color: var(--curriculum-orange); }
+    .curriculum-pathway { display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .curriculum-pathway-step { text-align: center; padding: 14px 20px; background: var(--curriculum-gray-5); border-radius: 8px; min-width: 220px; }
+    .curriculum-pathway-step__title { font-weight: 700; color: var(--curriculum-text); font-size: 0.95rem; margin-bottom: 4px; }
+    .curriculum-pathway-step__meta { font-size: 0.8rem; color: var(--curriculum-muted); }
+    .curriculum-pathway-arrow { font-size: 1.2rem; color: var(--curriculum-muted); line-height: 1; padding: 4px 0; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-main">
+      <div class="container-wide header-main__inner">
+        <a class="header-brand" href="#" id="header-brand-home" data-page="home">
+          <img src="Marshall SoM.png" alt="" class="logo-marshall" />
+          <span class="header-brand__text">
+            <strong>MARSHALL UNIVERSITY</strong>
+            <span>Joan C. Edwards School of Medicine</span>
+          </span>
+        </a>
+        <nav class="header-nav" id="header-nav" aria-label="Dashboard sections">
+          <a href="#" data-page="home">Home</a>
+          <a href="#" data-page="placemaking">Placemaking</a>
+          <a href="#" data-page="program-tools">Program</a>
+          <a href="#" data-page="curriculum">Curriculum</a>
+          <a href="#" data-page="methodology">Methodology</a>
+        </nav>
+        <div class="header-developed-by">
+          <span>Developed by</span>
+          <img src="PerkinsEastmanLogo.svg" alt="Perkins Eastman" class="logo-pe" />
+        </div>
+        <button type="button" class="hamburger" id="hamburger" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <div class="menu-overlay" id="menu-overlay"></div>
+  <nav class="menu-panel" id="menu-panel">
+    <a href="#" data-page="home">Home</a>
+    <a href="#" data-page="placemaking">Placemaking</a>
+    <a href="#" data-page="program-tools">Program</a>
+    <a href="#" data-page="curriculum">Curriculum Overview</a>
+    <a href="#" data-page="methodology">Methodology</a>
+    <div class="menu-panel__credit">
+      <span>Developed by</span>
+      <img src="PerkinsEastmanLogo.svg" alt="Perkins Eastman" class="logo-pe" />
+    </div>
+  </nav>
+  <div class="popup-overlay" id="img-popup">
+    <span class="popup-close" id="popup-close" aria-label="Close">&times;</span>
+    <div class="popup-content">
+      <img src="" alt="" id="popup-img" />
+      <div class="popup-scheme-metrics" id="popup-scheme-metrics">
+        <h4 id="popup-scheme-title"></h4>
+        <table id="popup-scheme-table"></table>
+      </div>
+    </div>
+  </div>
+  <div class="calc-panel" id="calc-panel">
+    <div class="calc-drag" id="calc-drag">Calculator — drag to move<button type="button" class="calc-close-x" id="calc-close-x" aria-label="Close">×</button></div>
+    <div class="calc-body">
+      <div class="calc-section tool-sqf">
+        <h4>Square Footage by Building</h4>
+        <div class="form-row">
+          <div class="field"><label>Academic (GSF)</label><input type="number" id="gsf-academic" value="217500" min="150000" max="280000" step="5000" /></div>
+          <div class="field"><label>Clinic</label><input type="number" id="gsf-clinic" value="15000" min="10000" max="25000" step="1000" /></div>
+          <div class="field"><label>Residential</label><input type="number" id="gsf-residential" value="77076" min="50000" max="100000" step="1000" /></div>
+          <div class="field"><label>Townhomes</label><input type="number" id="gsf-townhomes" value="76500" min="50000" max="100000" step="1000" /></div>
+        </div>
+        <div class="outputs">
+          <div class="output-box"><div class="label">Total GSF</div><div class="value" id="out-total-gsf">386,076</div></div>
+          <div class="output-box"><div class="label">Academic %</div><div class="value" id="out-acad-pct">56.3%</div></div>
+        </div>
+      </div>
+      <div class="calc-section tool-students">
+        <h4>Student Projections & SF/Student</h4>
+        <div class="form-row">
+          <div class="field"><label>Enrollment</label><input type="number" id="students" value="1000" min="600" max="1500" step="50" /></div>
+        </div>
+        <div class="outputs">
+          <div class="output-box"><div class="label">SF/Student (Academic)</div><div class="value" id="out-sf-student">217.5</div></div>
+          <div class="output-box"><div class="label">vs. 200–250</div><div class="value" id="out-benchmark">Within range</div></div>
+        </div>
+      </div>
+      <div class="calc-section tool-cost">
+        <h4>Cost Estimating</h4>
+        <div class="form-row">
+          <div class="field"><label>Budget ($M)</label><input type="number" id="budget" value="350" min="250" max="500" step="10" /></div>
+          <div class="field"><label>Total GSF</label><input type="number" id="cost-gsf" value="386076" readonly style="background:#eee;width:90px;" /></div>
+        </div>
+        <div class="outputs">
+          <div class="output-box"><div class="label">Cost per GSF</div><div class="value" id="out-cost-gsf">—</div></div>
+          <div class="output-box"><div class="label">Reference</div><div class="value" id="out-ref">~$637/GSF (ex VAT)</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="calc-close" id="calc-close">Close calculator</div>
+    <div class="calc-resize" id="calc-resize" aria-label="Resize"></div>
+  </div>
+    <!-- HOME -->
+  <section class="page" id="page-home">
+    <div class="landing-dashboard">
+      <aside class="landing-sidebar">
+        <div class="landing-sidebar__stamp">
+          <div class="example-data-stamp" aria-label="Example data">Example data</div>
+        </div>
+        <div class="landing-sidebar__body">
+        <div class="landing-filters">
+          <div class="landing-field">
+            <label for="filter-academic-year">Academic Year</label>
+            <select id="filter-academic-year">
+              <option>2025–2026</option>
+              <option>2024–2025</option>
+              <option>2023–2024</option>
+            </select>
+          </div>
+          <div class="landing-field">
+            <label for="filter-program">Program / Track</label>
+            <select id="filter-program">
+              <option value="all">All programs</option>
+              <option value="md">MD — Joan C. Edwards SOM</option>
+              <option value="pa">Physician Assistant</option>
+              <option value="grad">Graduate biomedical sciences</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="landing-metrics">
+          <div class="landing-metric-card">
+            <div class="label">Total Enrollment (MD)</div>
+            <div class="value" id="metric-md-enrollment">312</div>
+            <div class="sub">Placeholder · 4-year cohort</div>
+          </div>
+          <div class="landing-metric-card">
+            <div class="label">Clinical Rotation Sites</div>
+            <div class="value" id="metric-clinical-sites">11</div>
+            <div class="sub">Campus &amp; affiliated</div>
+          </div>
+          <div class="landing-metric-card">
+            <div class="label">Students on Clinical Rotations</div>
+            <div class="value" id="metric-clinical-students">156</div>
+            <div class="sub">Years 3–4 · estimated</div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="landing-section-title">Students by Program Track</h3>
+          <div class="landing-chart-card">
+            <div class="landing-chart-wrap"><canvas id="chart-program-mix"></canvas></div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="landing-section-title">Student Demographics &amp; Residency</h3>
+          <div class="landing-demographics-controls">
+            <div class="landing-field">
+              <label for="filter-residency">Student Residency</label>
+              <select id="filter-residency">
+                <option>All students</option>
+                <option>West Virginia</option>
+                <option>Out-of-state</option>
+                <option>International</option>
+              </select>
+            </div>
+            <div class="landing-slider-row">
+              <label for="filter-class-year">Class Year Focus</label>
+              <input type="range" id="filter-class-year" min="1" max="4" value="4" />
+            </div>
+          </div>
+          <table class="landing-table" id="demographics-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Share</th>
+                <th>Count (est.)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>West Virginia residents</td><td class="num">42%</td><td class="num">131</td></tr>
+              <tr><td>Out-of-state</td><td class="num">51%</td><td class="num">159</td></tr>
+              <tr><td>International</td><td class="num">7%</td><td class="num">22</td></tr>
+              <tr><td>Underrepresented in medicine</td><td class="num">18%</td><td class="num">56</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <h3 class="landing-section-title">Campus Locations</h3>
+          <table class="landing-table" id="locations-table">
+            <thead>
+              <tr>
+                <th>Facility</th>
+                <th>Category</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        </div>
+      </aside>
+
+      <main class="landing-map-panel">
+        <div id="marshall-map" role="region" aria-label="Marshall University School of Medicine campus map"></div>
+        <div class="map-panel map-layers-card collapsed" id="map-layers-card">
+          <button type="button" class="map-panel__toggle" id="map-layers-toggle" aria-expanded="false" aria-controls="map-layers-body">
+            <span class="map-panel__title">Map layers</span>
+            <span class="map-panel__chevron" aria-hidden="true">▾</span>
+          </button>
+          <div class="map-panel__body" id="map-layers-body">
+          <fieldset>
+            <legend class="visually-hidden">Layer options</legend>
+            <label><input type="checkbox" id="map-layer-campus" checked /> Campus &amp; clinical sites</label>
+            <label><input type="checkbox" id="map-layer-affiliated" checked /> Affiliated hospitals</label>
+            <label><input type="checkbox" id="map-layer-location-labels" checked /> Floating labels (all sites)</label>
+            <label><input type="checkbox" id="map-layer-northcott" checked /> Northcott Court site</label>
+            <label><input type="checkbox" id="map-layer-marshall-campus" checked /> Marshall University campus</label>
+            <label><input type="checkbox" id="map-layer-idea" checked /> IDEA District</label>
+          </fieldset>
+          <div class="site-boundary-editor collapsed" id="site-boundary-editor">
+            <button type="button" class="map-panel__toggle" id="site-boundary-toggle" aria-expanded="false" aria-controls="site-boundary-body">
+              <span class="map-panel__title">Site boundary editor</span>
+              <span class="map-panel__chevron" aria-hidden="true">▾</span>
+            </button>
+            <div class="map-panel__body" id="site-boundary-body">
+            <p class="map-edit-hint" id="map-edit-hint">Select a site, drag vertices on the map, then copy coordinates to share corrections.</p>
+            <div class="map-edit-btns">
+              <button type="button" id="edit-northcott-btn">Edit Northcott</button>
+              <button type="button" id="edit-marshall-campus-btn">Edit Marshall campus</button>
+              <button type="button" id="edit-idea-btn">Edit IDEA</button>
+              <button type="button" id="edit-done-btn" disabled>Done editing</button>
+            </div>
+            <textarea id="site-coords-export" readonly rows="7" placeholder="Coordinates appear here while editing…"></textarea>
+            <button type="button" id="copy-site-coords-btn">Copy coordinates</button>
+            </div>
+          </div>
+          <div class="landing-slider-row" style="margin-bottom:10px;">
+            <label for="map-radius">Study radius — <span id="map-radius-label">5 mi</span></label>
+            <input type="range" id="map-radius" min="0" max="24" value="14" step="1" />
+          </div>
+          <div>
+            <div class="landing-field" style="margin-bottom:6px;"><label>Basemap</label></div>
+            <div class="map-basemap-btns">
+              <button type="button" class="active" data-style="light">Light</button>
+              <button type="button" data-style="streets">Streets</button>
+              <button type="button" data-style="satellite">Satellite</button>
+            </div>
+          </div>
+          </div>
+        </div>
+        <div class="map-panel map-legend collapsed" id="map-legend-card">
+          <button type="button" class="map-panel__toggle" id="map-legend-toggle" aria-expanded="false" aria-controls="map-legend-body">
+            <span class="map-panel__title">Location types</span>
+            <span class="map-panel__chevron" aria-hidden="true">▾</span>
+          </button>
+          <div class="map-panel__body" id="map-legend-body"></div>
+        </div>
+      </main>
+    </div>
+  </section>
+
+  <!-- PLACEMAKING -->
+  <section class="page" id="page-placemaking">
+    <div class="page-inner container">
+      <div class="impact-three">
+        <div class="impact-card">
+          <h4>Students</h4>
+          <img src="Students.png" alt="Students" class="impact-img img-popup" onerror="this.style.display='none'" />
+          <div class="impact-body">
+            <strong>Key themes</strong>
+            <ul>
+              <li>Flexible student space</li>
+              <li>Modern classrooms</li>
+              <li>Outdoor spaces for all</li>
+              <li>A desirable community</li>
+              <li>Proximity to housing</li>
+              <li>Flexibility</li>
+            </ul>
+            <strong>Goals</strong>
+            <ul>
+              <li>Attract and retain students through flexible, modern learning environments that support multiple learning styles</li>
+              <li>Enhance student life through welcoming outdoor spaces that promote wellness, connection, and informal learning</li>
+              <li>Strengthen recruitment by situating the campus within a desirable, vibrant community</li>
+              <li>Reduce barriers to enrollment and persistence through proximity to desired housing and daily amenities</li>
+            </ul>
+          </div>
+        </div>
+        <div class="impact-card">
+          <h4>Faculty</h4>
+          <img src="Faculty.png" alt="Faculty" class="impact-img img-popup" onerror="this.style.display='none'" />
+          <div class="impact-body">
+            <strong>Key themes</strong>
+            <ul>
+              <li>Faculty offices</li>
+              <li>Proximity to housing</li>
+              <li>A desirable community</li>
+              <li>Stability and growth</li>
+            </ul>
+            <strong>Goals</strong>
+            <ul>
+              <li>Recruit and retain faculty and staff through modern, high-quality work environments that support focus, collaboration, and mentorship</li>
+              <li>Promote long-term commitment by locating the campus within a livable, attractive community</li>
+              <li>Support work-life integration through convenient access to housing and amenities</li>
+              <li>Create conditions that encourage institutional stability, continuity, and professional growth</li>
+            </ul>
+          </div>
+        </div>
+        <div class="impact-card">
+          <h4>Facilities</h4>
+          <img src="Facilities.png" alt="Facilities" class="impact-img img-popup" onerror="this.style.display='none'" />
+          <div class="impact-body">
+            <strong>Key themes</strong>
+            <ul>
+              <li>Flexible student space</li>
+              <li>Modern classrooms</li>
+              <li>Outdoor spaces for all</li>
+              <li>Flexibility</li>
+              <li>Community integration</li>
+            </ul>
+            <strong>Goals</strong>
+            <ul>
+              <li>Deliver flexible, adaptable facilities that can evolve with changing educational and programmatic needs</li>
+              <li>Provide modern classrooms that support collaborative, technology-enabled medical education</li>
+              <li>Activate the campus through inclusive outdoor spaces that serve students, faculty, staff, and visitors</li>
+              <li>Integrate facilities into the surrounding context to reinforce a connected, desirable campus environment</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRAM -->
+  <section class="page" id="page-program-tools">
+    <div class="page-inner container page-infographic-inner">
+      <img src="MarshallProgram.png" alt="Marshall School of Medicine program spaces" class="page-img page-infographic-img img-popup" />
+    </div>
+  </section>
+
+  <!-- CURRICULUM OVERVIEW -->
+  <section class="page" id="page-curriculum">
+    <div class="page-inner container page-infographic-inner">
+      <img src="MarshallCurriculum.png" alt="Medical Student Education curriculum" class="page-img page-infographic-img img-popup" />
+    </div>
+  </section>
+
+  <!-- METHODOLOGY -->
+  <section class="page" id="page-methodology">
+    <div class="page-inner container page-infographic-inner">
+      <img src="MarshallMethodology.png" alt="Master planning process" class="page-img page-infographic-img img-popup" />
+    </div>
+  </section>
+
+  <script>
+    (function() {
+      var hamburger = document.getElementById('hamburger');
+      var overlay = document.getElementById('menu-overlay');
+      var panel = document.getElementById('menu-panel');
+      var links = document.querySelectorAll('.menu-panel a[data-page], .header-nav a[data-page], #header-brand-home');
+      var pages = document.querySelectorAll('.page');
+
+      var pageMeta = {
+        home: { title: 'Student & Enrollment Dashboard', crumb: 'Student & Enrollment Dashboard' },
+        placemaking: { title: 'Placemaking', crumb: 'Placemaking' },
+        'program-tools': { title: 'Program', crumb: 'Program' },
+        curriculum: { title: 'Curriculum Overview', crumb: 'Curriculum Overview' },
+        methodology: { title: 'Master Planning Methodology', crumb: 'Methodology' }
+      };
+
+      pages.forEach(function(page) {
+        var pageId = page.id.replace('page-', '');
+        var meta = pageMeta[pageId];
+        if (!meta || pageId === 'home' || page.querySelector('.page-heading')) return;
+        var heading = document.createElement('div');
+        heading.className = 'page-heading';
+        heading.innerHTML = '<div class="container-wide"><h2>' + meta.title + '</h2></div>';
+        page.insertBefore(heading, page.firstChild);
+      });
+
+      var marshallMap = null;
+      function goTo(pageId) {
+        pageId = pageId || 'home';
+        var target = document.getElementById('page-' + pageId);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.querySelectorAll('.menu-panel a[data-page], .header-nav a[data-page]').forEach(function(a) {
+          a.classList.toggle('active', a.getAttribute('data-page') === pageId);
+        });
+        if (pageId === 'home' && marshallMap) {
+          setTimeout(function() { marshallMap.resize(); }, 400);
+        }
+        closeMenu();
+      }
+      function openMenu() {
+        hamburger.classList.add('open');
+        overlay.classList.add('visible');
+        panel.classList.add('visible');
+      }
+      function closeMenu() {
+        hamburger.classList.remove('open');
+        overlay.classList.remove('visible');
+        panel.classList.remove('visible');
+      }
+      hamburger.addEventListener('click', function() {
+        if (panel.classList.contains('visible')) closeMenu(); else openMenu();
+      });
+      overlay.addEventListener('click', closeMenu);
+      links.forEach(function(a) {
+        a.addEventListener('click', function(e) {
+          e.preventDefault();
+          goTo(a.getAttribute('data-page'));
+        });
+      });
+      document.querySelectorAll('.menu-panel a[data-page="home"], .header-nav a[data-page="home"]').forEach(function(a) {
+        a.classList.add('active');
+      });
+
+      if (typeof IntersectionObserver !== 'undefined') {
+        var sectionObserver = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (!entry.isIntersecting) return;
+            var pageId = entry.target.id.replace('page-', '');
+            document.querySelectorAll('.menu-panel a[data-page], .header-nav a[data-page]').forEach(function(a) {
+              a.classList.toggle('active', a.getAttribute('data-page') === pageId);
+            });
+          });
+        }, { rootMargin: '-' + (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 110) + 'px 0px -55% 0px', threshold: 0 });
+        pages.forEach(function(page) { sectionObserver.observe(page); });
+      }
+
+      // Home landing: Mapbox map, charts, and location data
+      (function initMarshallLanding() {
+        var marshallLocations = [
+          { name: "Marshall University Medical Center", category: "Health Sciences Campus", address: "1600 Medical Center Drive, Huntington, WV 25701", coordinates: [-82.42658, 38.40692], description: "Clinical teaching, outreach and service programs for the Joan C. Edwards School of Medicine." },
+          { name: "Edwards Comprehensive Cancer Center", category: "Cancer Center", address: "1400 Hal Greer Boulevard, Huntington, WV 25701", coordinates: [-82.42746, 38.40909], description: "Three-story cancer center with advanced diagnostic and treatment services." },
+          { name: "Erma Ora Byrd Clinical Center", category: "Clinical Education", address: "1249 15th Street, Huntington, WV 25701", coordinates: [-82.42975, 38.40820], description: "Medical student teaching space and patient care clinics at the former Fairfield Stadium site." },
+          { name: "Forensic Science Center", category: "Science / Research", address: "1401 Forensic Science Drive, Huntington, WV 25701", coordinates: [-82.43120, 38.40655], description: "Forensic analysis center supporting justice, education and public service." },
+          { name: "Linda S. Holmes Student Wellness Center", category: "Student Support", address: "1321 Hal Greer Blvd., Huntington, WV 25701", coordinates: [-82.42865, 38.40895], description: "Medical student study, relaxation, student affairs and financial aid space." },
+          { name: "Robert W. Coon Education Building", category: "VA Medical Center Campus", address: "1542 Spring Valley Drive, Huntington, WV 25704", coordinates: [-82.51686, 38.37718], description: "Anatomy classrooms, labs, Human Gift Registry and Physician Assistant program." },
+          { name: "Robert C. Byrd Biotechnology Sciences Center", category: "Main Campus", address: "Marshall University Main Campus, Huntington, WV 25755", coordinates: [-82.42770, 38.42514], description: "Biomedical and biotechnology research and development center." },
+          { name: "Touma Museum of Medicine", category: "Downtown Huntington", address: "314 Ninth Street, Huntington, WV 25701", coordinates: [-82.44415, 38.42135], description: "Medical history museum with 2,800+ artifacts. Visits by appointment only." },
+          { name: "Cabell Huntington Hospital", category: "Affiliated Medical Facility", address: "1340 Hal Greer Boulevard, Huntington, WV 25701", coordinates: [-82.42825, 38.41015], description: "Major affiliated teaching hospital." },
+          { name: "St. Mary's Medical Center", category: "Affiliated Medical Facility", address: "2900 1st Avenue, Huntington, WV 25702", coordinates: [-82.40055, 38.43280], description: "Major affiliated medical center." },
+          { name: "Hershel \"Woody\" Williams VA Medical Center", category: "Affiliated Medical Facility", address: "1540 Spring Valley Drive, Huntington, WV 25704", coordinates: [-82.51686, 38.37718], description: "VA medical center and affiliated School of Medicine campus." }
+        ];
+
+        var categoryColors = {
+          "Health Sciences Campus": "#007a3d",
+          "Cancer Center": "#dc2626",
+          "Clinical Education": "#0891b2",
+          "Science / Research": "#7c3aed",
+          "Student Support": "#059669",
+          "VA Medical Center Campus": "#b45309",
+          "Main Campus": "#00a651",
+          "Downtown Huntington": "#6b7280",
+          "Affiliated Medical Facility": "#e11d48"
+        };
+
+        var mapStyles = {
+          light: "mapbox://styles/mapbox/light-v11",
+          streets: "mapbox://styles/mapbox/streets-v12",
+          satellite: "mapbox://styles/mapbox/satellite-streets-v12"
+        };
+
+        var locationsTableBody = document.querySelector('#locations-table tbody');
+        if (locationsTableBody) {
+          marshallLocations.forEach(function(loc) {
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + loc.name + '</td><td>' + loc.category + '</td>';
+            tr.style.cursor = 'pointer';
+            tr.addEventListener('click', function() {
+              if (marshallMap) {
+                marshallMap.flyTo({ center: loc.coordinates, zoom: 15, speed: 1.2 });
+              }
+            });
+            locationsTableBody.appendChild(tr);
+          });
+        }
+
+        var legendBody = document.getElementById('map-legend-body');
+        if (legendBody) {
+          var seen = {};
+          marshallLocations.forEach(function(loc) {
+            if (seen[loc.category]) return;
+            seen[loc.category] = true;
+            var row = document.createElement('div');
+            row.className = 'map-legend-row';
+            row.innerHTML = '<span class="map-legend-swatch" style="background:' + (categoryColors[loc.category] || '#6b7280') + '"></span><span>' + loc.category + '</span>';
+            legendBody.appendChild(row);
+          });
+          var siteRow = document.createElement('div');
+          siteRow.className = 'map-legend-row';
+          siteRow.innerHTML = '<span class="map-legend-swatch map-legend-swatch--site"></span><span>Northcott Court (proposed SOM site)</span>';
+          legendBody.appendChild(siteRow);
+          var campusRow = document.createElement('div');
+          campusRow.className = 'map-legend-row';
+          campusRow.innerHTML = '<span class="map-legend-swatch map-legend-swatch--marshall-campus"></span><span>Marshall University campus</span>';
+          legendBody.appendChild(campusRow);
+          var ideaRow = document.createElement('div');
+          ideaRow.className = 'map-legend-row';
+          ideaRow.innerHTML = '<span class="map-legend-swatch map-legend-swatch--idea"></span><span>IDEA District</span>';
+          legendBody.appendChild(ideaRow);
+        }
+
+        function initMapPanelCollapse(toggleId, panelId) {
+          var toggle = document.getElementById(toggleId);
+          var panel = document.getElementById(panelId);
+          if (!toggle || !panel) return;
+          toggle.addEventListener('click', function() {
+            var collapsed = panel.classList.toggle('collapsed');
+            toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+            if (panelId === 'map-layers-card' || panelId === 'map-legend-card') updateMapOverlayLayout();
+          });
+        }
+        initMapPanelCollapse('map-layers-toggle', 'map-layers-card');
+        initMapPanelCollapse('map-legend-toggle', 'map-legend-card');
+        initMapPanelCollapse('site-boundary-toggle', 'site-boundary-editor');
+
+        function updateMapOverlayLayout() {
+          var mapPanel = document.querySelector('.landing-map-panel');
+          var layersCard = document.getElementById('map-layers-card');
+          var legendCard = document.getElementById('map-legend-card');
+          var legendBody = document.getElementById('map-legend-body');
+          if (!mapPanel || !layersCard || !legendCard) return;
+          var panelWidth = Math.min(280, Math.max(200, mapPanel.clientWidth - 28));
+          layersCard.style.width = panelWidth + 'px';
+          legendCard.style.width = panelWidth + 'px';
+          if (!legendCard.classList.contains('collapsed')) {
+            var mapHeight = mapPanel.clientHeight;
+            var layersBottom = layersCard.offsetTop + layersCard.offsetHeight;
+            var available = mapHeight - layersBottom - 24;
+            var toggleH = legendCard.querySelector('.map-panel__toggle');
+            var headerHeight = toggleH ? toggleH.offsetHeight : 40;
+            var bodyMax = Math.max(80, available - headerHeight);
+            legendCard.style.maxHeight = (available + headerHeight) + 'px';
+            if (legendBody) legendBody.style.maxHeight = bodyMax + 'px';
+          } else {
+            legendCard.style.maxHeight = '';
+            if (legendBody) legendBody.style.maxHeight = '';
+          }
+        }
+
+        if (typeof Chart !== 'undefined') {
+          var mixCtx = document.getElementById('chart-program-mix');
+          if (mixCtx) {
+            new Chart(mixCtx, {
+              type: 'bar',
+              data: {
+                labels: ['MD', 'PA', 'Grad'],
+                datasets: [{
+                  data: [312, 48, 36],
+                  backgroundColor: ['#00a651', '#0891b2', '#7c3aed'],
+                  borderRadius: 4
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                  x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                  y: { beginAtZero: true, ticks: { font: { size: 10 } } }
+                }
+              }
+            });
+          }
+        }
+
+        var mapContainer = document.getElementById('marshall-map');
+        if (!mapContainer || typeof mapboxgl === 'undefined') return;
+
+        mapboxgl.accessToken = window.MAPBOX_ACCESS_TOKEN || '';
+        if (!mapboxgl.accessToken) {
+          mapContainer.innerHTML = '<p style="padding:1rem;color:#6b7280;">Map not configured. Copy <code>mapbox-config.example.js</code> to <code>mapbox-config.local.js</code> and add your Mapbox token.</p>';
+          return;
+        }
+
+        var locationsSourceId = 'marshall-locations';
+        var radiusSourceId = 'study-radius';
+        var radiusSteps = (function() {
+          var steps = [];
+          for (var i = 0; i <= 8; i++) steps.push(i * 0.25);
+          for (var j = 5; j <= 20; j++) steps.push(j * 0.5);
+          return steps;
+        })();
+
+        function radiusFromIndex(idx) {
+          idx = Math.max(0, Math.min(radiusSteps.length - 1, Number(idx) || 0));
+          return radiusSteps[idx];
+        }
+
+        function formatRadiusMiles(miles) {
+          return parseFloat(miles.toFixed(2)) + ' mi';
+        }
+
+        var northcottSourceId = 'northcott-court';
+        var marshallCampusSourceId = 'marshall-campus';
+        var ideaDistrictSourceId = 'idea-district';
+        var showCampusSites = true;
+        var showLocationLabels = true;
+        var showAffiliatedSites = true;
+        var showNorthcottSite = true;
+        var showMarshallCampus = true;
+        var showIdeaDistrict = true;
+        var siteDraw = null;
+        var activeSiteEdit = null;
+
+        var northcottCourtGeoJSON = {
+          type: 'Feature',
+          properties: {
+            name: 'Northcott Court',
+            description: 'Proposed site for the standalone Joan C. Edwards School of Medicine and Community Health Institute (~3.9 acres). Bounded by Hal Greer Blvd and Northcott Ct.'
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[
+              [-82.4284036, 38.4141684],
+              [-82.4278839, 38.4123153],
+              [-82.4287013, 38.4121755],
+              [-82.4287268, 38.4121787],
+              [-82.4287429, 38.4121918],
+              [-82.4290513, 38.4133309],
+              [-82.4292324, 38.4139877],
+              [-82.4292250, 38.4140176],
+              [-82.4291942, 38.4140355],
+              [-82.4284036, 38.4141684]
+            ]]
+          }
+        };
+
+        var marshallCampusGeoJSON = {
+          type: 'Feature',
+          properties: {
+            name: 'Marshall University',
+            description: 'Main Huntington campus boundary. Use the boundary editor to adjust.'
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[
+              [-82.4322522, 38.4245129],
+              [-82.4313953, 38.4216659],
+              [-82.4281753, 38.4222268],
+              [-82.4283184, 38.4227367],
+              [-82.4283413, 38.4228182],
+              [-82.4280169, 38.4228732],
+              [-82.4279941, 38.4227920],
+              [-82.4278510, 38.4222825],
+              [-82.4227320, 38.4231740],
+              [-82.4228053, 38.4237884],
+              [-82.4195851, 38.4243197],
+              [-82.4202098, 38.4259231],
+              [-82.4231151, 38.4254832],
+              [-82.4230902, 38.4250741],
+              [-82.4237353, 38.4249972],
+              [-82.4241866, 38.4249181],
+              [-82.4243464, 38.4253982],
+              [-82.4249357, 38.4252894],
+              [-82.4251598, 38.4258102],
+              [-82.4322522, 38.4245129]
+            ]]
+          }
+        };
+
+        var ideaDistrictGeoJSON = {
+          type: 'Feature',
+          properties: {
+            name: 'IDEA District',
+            description: 'Marshall University innovation district between downtown Huntington and campus (~6 blocks). Bounded by 3rd Avenue, 4th Avenue, 14th Street, and Hal Greer Boulevard. Anchored by the Brad D. Smith Center and the Institute for Cyber Security.'
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[
+              [-82.4354439, 38.4228510],
+              [-82.4320769, 38.4234100],
+              [-82.4318800, 38.4228758],
+              [-82.4314983, 38.4214688],
+              [-82.4331811, 38.4211997],
+              [-82.4333911, 38.4218531],
+              [-82.4350864, 38.4216006],
+              [-82.4354439, 38.4228510]
+            ]]
+          }
+        };
+
+        (function loadSavedSitePolygons() {
+          try {
+            var northcottSaved = localStorage.getItem('marshall-northcott-polygon');
+            if (northcottSaved) northcottCourtGeoJSON.geometry.coordinates = JSON.parse(northcottSaved);
+            var marshallCampusVersion = localStorage.getItem('marshall-campus-polygon-version');
+            if (marshallCampusVersion !== '2') {
+              localStorage.removeItem('marshall-campus-polygon');
+              localStorage.setItem('marshall-campus-polygon-version', '2');
+            } else {
+              var marshallCampusSaved = localStorage.getItem('marshall-campus-polygon');
+              if (marshallCampusSaved) marshallCampusGeoJSON.geometry.coordinates = JSON.parse(marshallCampusSaved);
+            }
+            var ideaVersion = localStorage.getItem('marshall-idea-polygon-version');
+            if (ideaVersion !== '2') {
+              localStorage.removeItem('marshall-idea-polygon');
+              localStorage.setItem('marshall-idea-polygon-version', '2');
+            } else {
+              var ideaSaved = localStorage.getItem('marshall-idea-polygon');
+              if (ideaSaved) ideaDistrictGeoJSON.geometry.coordinates = JSON.parse(ideaSaved);
+            }
+          } catch (e) { /* ignore invalid saved data */ }
+        })();
+
+        function getPolygonCentroid(ring) {
+          if (!ring || !ring.length) return [-82.4287, 38.4132];
+          var sumLng = 0;
+          var sumLat = 0;
+          var n = 0;
+          for (var i = 0; i < ring.length; i++) {
+            if (i === ring.length - 1 && ring.length > 1 &&
+                ring[i][0] === ring[0][0] && ring[i][1] === ring[0][1]) continue;
+            sumLng += ring[i][0];
+            sumLat += ring[i][1];
+            n++;
+          }
+          return n ? [sumLng / n, sumLat / n] : ring[0];
+        }
+
+        function getNorthcottCenter() {
+          return getPolygonCentroid(northcottCourtGeoJSON.geometry.coordinates[0]);
+        }
+
+        function boundsForRadiusAroundCenter(center, miles) {
+          var bounds = new mapboxgl.LngLatBounds(center, center);
+          northcottCourtGeoJSON.geometry.coordinates[0].forEach(function(coord) { bounds.extend(coord); });
+          if (miles > 0) {
+            var km = miles * 1.60934;
+            var latOffset = km / 110.57;
+            var lngOffset = km / (111.32 * Math.cos(center[1] * Math.PI / 180));
+            bounds.extend([center[0] - lngOffset, center[1] - latOffset]);
+            bounds.extend([center[0] + lngOffset, center[1] + latOffset]);
+          }
+          return bounds;
+        }
+
+        function getSiteConfig(siteKey) {
+          var configs = {
+            northcott: {
+              key: 'northcott',
+              label: 'Northcott Court',
+              geo: northcottCourtGeoJSON,
+              sourceId: northcottSourceId,
+              storageKey: 'marshall-northcott-polygon',
+              setVisibility: setNorthcottVisibility,
+              layerPrefix: 'northcott'
+            },
+            marshallCampus: {
+              key: 'marshallCampus',
+              label: 'Marshall University campus',
+              geo: marshallCampusGeoJSON,
+              sourceId: marshallCampusSourceId,
+              storageKey: 'marshall-campus-polygon',
+              setVisibility: setMarshallCampusVisibility,
+              layerPrefix: 'marshall-campus'
+            },
+            idea: {
+              key: 'idea',
+              label: 'IDEA District',
+              geo: ideaDistrictGeoJSON,
+              sourceId: ideaDistrictSourceId,
+              storageKey: 'marshall-idea-polygon',
+              setVisibility: setIdeaDistrictVisibility,
+              layerPrefix: 'idea'
+            }
+          };
+          return configs[siteKey] || null;
+        }
+
+        function restoreSiteVisibility(siteKey) {
+          if (siteKey === 'northcott') {
+            setNorthcottVisibility(showNorthcottSite);
+            var radiusInput = document.getElementById('map-radius');
+            updateRadiusCircle(radiusFromIndex(radiusInput ? radiusInput.value : 14));
+          } else if (siteKey === 'marshallCampus') {
+            setMarshallCampusVisibility(showMarshallCampus);
+          } else if (siteKey === 'idea') {
+            setIdeaDistrictVisibility(showIdeaDistrict);
+          }
+        }
+
+        function updateSitePolygonSource(siteKey) {
+          var cfg = getSiteConfig(siteKey);
+          if (marshallMap.getSource(cfg.sourceId)) {
+            marshallMap.getSource(cfg.sourceId).setData(cfg.geo);
+          }
+        }
+
+        function formatCoordsForExport(siteKey, coordinates) {
+          var ring = coordinates[0] || [];
+          var lines = ring.map(function(c) {
+            return '              [' + c[0].toFixed(7) + ', ' + c[1].toFixed(7) + ']';
+          });
+          return '// ' + getSiteConfig(siteKey).label + '\n' + lines.join(',\n');
+        }
+
+        function refreshCoordsExport() {
+          var exportEl = document.getElementById('site-coords-export');
+          if (!exportEl || !activeSiteEdit) return;
+          var cfg = getSiteConfig(activeSiteEdit);
+          exportEl.value = formatCoordsForExport(activeSiteEdit, cfg.geo.geometry.coordinates);
+          if (siteDraw) {
+            var drawn = siteDraw.getAll();
+            if (drawn.features.length) {
+              exportEl.value = formatCoordsForExport(activeSiteEdit, drawn.features[0].geometry.coordinates);
+            }
+          }
+        }
+
+        function setEditButtonsState() {
+          var northcottBtn = document.getElementById('edit-northcott-btn');
+          var marshallCampusBtn = document.getElementById('edit-marshall-campus-btn');
+          var ideaBtn = document.getElementById('edit-idea-btn');
+          var doneBtn = document.getElementById('edit-done-btn');
+          var hint = document.getElementById('map-edit-hint');
+          if (northcottBtn) {
+            northcottBtn.disabled = activeSiteEdit && activeSiteEdit !== 'northcott';
+            northcottBtn.classList.toggle('active', activeSiteEdit === 'northcott');
+          }
+          if (marshallCampusBtn) {
+            marshallCampusBtn.disabled = activeSiteEdit && activeSiteEdit !== 'marshallCampus';
+            marshallCampusBtn.classList.toggle('active', activeSiteEdit === 'marshallCampus');
+          }
+          if (ideaBtn) {
+            ideaBtn.disabled = activeSiteEdit && activeSiteEdit !== 'idea';
+            ideaBtn.classList.toggle('active', activeSiteEdit === 'idea');
+          }
+          if (doneBtn) doneBtn.disabled = !activeSiteEdit;
+          if (hint && activeSiteEdit) {
+            hint.textContent = 'Editing ' + getSiteConfig(activeSiteEdit).label + ' — drag vertices or midpoints. Click Done when finished, then copy coordinates.';
+          } else if (hint) {
+            hint.textContent = 'Select a site, drag vertices on the map, then copy coordinates to share corrections.';
+          }
+        }
+
+        function syncDrawToGeojson() {
+          if (!siteDraw || !activeSiteEdit) return;
+          var drawn = siteDraw.getAll();
+          if (!drawn.features.length) return;
+          var coords = drawn.features[0].geometry.coordinates;
+          var cfg = getSiteConfig(activeSiteEdit);
+          cfg.geo.geometry.coordinates = coords;
+          updateSitePolygonSource(activeSiteEdit);
+          refreshCoordsExport();
+        }
+
+        function initSiteDraw() {
+          if (typeof MapboxDraw === 'undefined' || siteDraw) return;
+          siteDraw = new MapboxDraw({
+            displayControlsDefault: false,
+            controls: {},
+            defaultMode: 'simple_select'
+          });
+          marshallMap.addControl(siteDraw);
+          marshallMap.on('draw.update', syncDrawToGeojson);
+          marshallMap.on('draw.create', syncDrawToGeojson);
+        }
+
+        function startSiteEdit(siteKey) {
+          if (!marshallMap || typeof MapboxDraw === 'undefined') return;
+          if (activeSiteEdit === siteKey) return;
+          if (activeSiteEdit) finishSiteEdit(true);
+          initSiteDraw();
+          var cfg = getSiteConfig(siteKey);
+          if (!cfg) return;
+          activeSiteEdit = siteKey;
+          cfg.setVisibility(false);
+          siteDraw.deleteAll();
+          var added = siteDraw.add({
+            type: 'Feature',
+            properties: { siteKey: siteKey },
+            geometry: JSON.parse(JSON.stringify(cfg.geo.geometry))
+          });
+          siteDraw.changeMode('direct_select', { featureId: added[0] });
+          setEditButtonsState();
+          refreshCoordsExport();
+          var ring = cfg.geo.geometry.coordinates[0];
+          if (ring && ring.length) {
+            var bounds = ring.reduce(function(b, coord) { return b.extend(coord); }, new mapboxgl.LngLatBounds(ring[0], ring[0]));
+            marshallMap.fitBounds(bounds, { padding: 80, maxZoom: 16, duration: 800 });
+          }
+        }
+
+        function finishSiteEdit(apply) {
+          if (!activeSiteEdit) return;
+          var siteKey = activeSiteEdit;
+          var cfg = getSiteConfig(siteKey);
+          if (!cfg) return;
+          if (apply && siteDraw) {
+            var drawn = siteDraw.getAll();
+            if (drawn.features.length) {
+              var coords = drawn.features[0].geometry.coordinates;
+              cfg.geo.geometry.coordinates = coords;
+              localStorage.setItem(cfg.storageKey, JSON.stringify(coords));
+              updateSitePolygonSource(siteKey);
+              refreshCoordsExport();
+            }
+          }
+          if (siteDraw) siteDraw.deleteAll();
+          activeSiteEdit = null;
+          setEditButtonsState();
+          restoreSiteVisibility(siteKey);
+        }
+
+        function setNorthcottVisibility(visible) {
+          ['northcott-fill', 'northcott-line', 'northcott-label'].forEach(function(layerId) {
+            if (marshallMap.getLayer(layerId)) {
+              marshallMap.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none');
+            }
+          });
+        }
+
+        function setMarshallCampusVisibility(visible) {
+          ['marshall-campus-fill', 'marshall-campus-line', 'marshall-campus-label'].forEach(function(layerId) {
+            if (marshallMap.getLayer(layerId)) {
+              marshallMap.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none');
+            }
+          });
+        }
+
+        function setIdeaDistrictVisibility(visible) {
+          ['idea-fill', 'idea-line', 'idea-label'].forEach(function(layerId) {
+            if (marshallMap.getLayer(layerId)) {
+              marshallMap.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none');
+            }
+          });
+        }
+
+        function setupMarshallGeoLayers() {
+          if (!marshallMap.getSource(radiusSourceId)) {
+            marshallMap.addSource(radiusSourceId, {
+              type: 'geojson',
+              data: { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[]] } }
+            });
+            marshallMap.addLayer({
+              id: 'study-radius-fill',
+              type: 'fill',
+              source: radiusSourceId,
+              paint: { 'fill-color': '#00a651', 'fill-opacity': 0.06 }
+            });
+            marshallMap.addLayer({
+              id: 'study-radius-line',
+              type: 'line',
+              source: radiusSourceId,
+              paint: { 'line-color': '#00a651', 'line-width': 2, 'line-opacity': 0.5 }
+            });
+          }
+
+          if (!marshallMap.getSource(northcottSourceId)) {
+            marshallMap.addSource(northcottSourceId, { type: 'geojson', data: northcottCourtGeoJSON });
+            marshallMap.addLayer({
+              id: 'northcott-fill',
+              type: 'fill',
+              source: northcottSourceId,
+              paint: { 'fill-color': '#00a651', 'fill-opacity': 0.22 }
+            });
+            marshallMap.addLayer({
+              id: 'northcott-line',
+              type: 'line',
+              source: northcottSourceId,
+              paint: {
+                'line-color': '#111827',
+                'line-width': 2.5,
+                'line-dasharray': [2, 2]
+              }
+            });
+            marshallMap.addLayer({
+              id: 'northcott-label',
+              type: 'symbol',
+              source: northcottSourceId,
+              layout: {
+                'text-field': 'Northcott Court',
+                'text-size': 12,
+                'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                'text-anchor': 'center'
+              },
+              paint: {
+                'text-color': '#007a3d',
+                'text-halo-color': '#ffffff',
+                'text-halo-width': 1.5
+              }
+            });
+
+            marshallMap.on('click', 'northcott-fill', function(e) {
+              var props = northcottCourtGeoJSON.properties;
+              new mapboxgl.Popup({ offset: 12 })
+                .setLngLat(e.lngLat)
+                .setHTML('<h3>' + props.name + '</h3><div class="cat">Proposed SOM site</div><p>' + props.description + '</p>')
+                .addTo(marshallMap);
+            });
+            marshallMap.on('mouseenter', 'northcott-fill', function() { marshallMap.getCanvas().style.cursor = 'pointer'; });
+            marshallMap.on('mouseleave', 'northcott-fill', function() { marshallMap.getCanvas().style.cursor = ''; });
+          } else {
+            marshallMap.getSource(northcottSourceId).setData(northcottCourtGeoJSON);
+          }
+
+          if (!marshallMap.getSource(marshallCampusSourceId)) {
+            marshallMap.addSource(marshallCampusSourceId, { type: 'geojson', data: marshallCampusGeoJSON });
+            marshallMap.addLayer({
+              id: 'marshall-campus-fill',
+              type: 'fill',
+              source: marshallCampusSourceId,
+              paint: { 'fill-color': '#2563eb', 'fill-opacity': 0.14 }
+            });
+            marshallMap.addLayer({
+              id: 'marshall-campus-line',
+              type: 'line',
+              source: marshallCampusSourceId,
+              paint: {
+                'line-color': '#1e3a8a',
+                'line-width': 2.5,
+                'line-dasharray': [2, 2]
+              }
+            });
+            marshallMap.addLayer({
+              id: 'marshall-campus-label',
+              type: 'symbol',
+              source: marshallCampusSourceId,
+              layout: {
+                'text-field': 'Marshall University',
+                'text-size': 12,
+                'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                'text-anchor': 'center'
+              },
+              paint: {
+                'text-color': '#1e40af',
+                'text-halo-color': '#ffffff',
+                'text-halo-width': 1.5
+              }
+            });
+
+            marshallMap.on('click', 'marshall-campus-fill', function(e) {
+              var props = marshallCampusGeoJSON.properties;
+              new mapboxgl.Popup({ offset: 12 })
+                .setLngLat(e.lngLat)
+                .setHTML('<h3>' + props.name + '</h3><div class="cat">Main campus</div><p>' + props.description + '</p>')
+                .addTo(marshallMap);
+            });
+            marshallMap.on('mouseenter', 'marshall-campus-fill', function() { marshallMap.getCanvas().style.cursor = 'pointer'; });
+            marshallMap.on('mouseleave', 'marshall-campus-fill', function() { marshallMap.getCanvas().style.cursor = ''; });
+          } else {
+            marshallMap.getSource(marshallCampusSourceId).setData(marshallCampusGeoJSON);
+          }
+
+          if (!marshallMap.getSource(ideaDistrictSourceId)) {
+            marshallMap.addSource(ideaDistrictSourceId, { type: 'geojson', data: ideaDistrictGeoJSON });
+            marshallMap.addLayer({
+              id: 'idea-fill',
+              type: 'fill',
+              source: ideaDistrictSourceId,
+              paint: { 'fill-color': '#ea580c', 'fill-opacity': 0.28 }
+            });
+            marshallMap.addLayer({
+              id: 'idea-line',
+              type: 'line',
+              source: ideaDistrictSourceId,
+              paint: {
+                'line-color': '#111827',
+                'line-width': 2.5,
+                'line-dasharray': [2, 2]
+              }
+            });
+            marshallMap.addLayer({
+              id: 'idea-label',
+              type: 'symbol',
+              source: ideaDistrictSourceId,
+              layout: {
+                'text-field': 'IDEA District',
+                'text-size': 12,
+                'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                'text-anchor': 'center'
+              },
+              paint: {
+                'text-color': '#c2410c',
+                'text-halo-color': '#ffffff',
+                'text-halo-width': 1.5
+              }
+            });
+
+            marshallMap.on('click', 'idea-fill', function(e) {
+              var props = ideaDistrictGeoJSON.properties;
+              new mapboxgl.Popup({ offset: 12 })
+                .setLngLat(e.lngLat)
+                .setHTML('<h3>' + props.name + '</h3><div class="cat">Innovation district</div><p>' + props.description + '</p>')
+                .addTo(marshallMap);
+            });
+            marshallMap.on('mouseenter', 'idea-fill', function() { marshallMap.getCanvas().style.cursor = 'pointer'; });
+            marshallMap.on('mouseleave', 'idea-fill', function() { marshallMap.getCanvas().style.cursor = ''; });
+          } else {
+            marshallMap.getSource(ideaDistrictSourceId).setData(ideaDistrictGeoJSON);
+          }
+
+          updateRadiusCircle(radiusFromIndex(document.getElementById('map-radius') ? document.getElementById('map-radius').value : 14));
+          if (!activeSiteEdit) {
+            setNorthcottVisibility(showNorthcottSite);
+            setMarshallCampusVisibility(showMarshallCampus);
+            setIdeaDistrictVisibility(showIdeaDistrict);
+          }
+          setupLocationLayers();
+        }
+
+        function getLocationCoordinates(loc) {
+          if (loc.coordinates[0] === -82.51686 && loc.name.indexOf('Coon') >= 0) {
+            return [-82.51555, 38.37755];
+          }
+          if (loc.coordinates[0] === -82.51686 && loc.name.indexOf('VA') >= 0) {
+            return [-82.51815, 38.37685];
+          }
+          return loc.coordinates;
+        }
+
+        function buildLocationsGeoJSON() {
+          var features = [];
+          marshallLocations.forEach(function(loc, i) {
+            if (!locationVisible(loc)) return;
+            features.push({
+              type: 'Feature',
+              geometry: { type: 'Point', coordinates: getLocationCoordinates(loc) },
+              properties: {
+                name: loc.name,
+                category: loc.category,
+                description: loc.description,
+                color: categoryColors[loc.category] || '#6b7280',
+                sortKey: i
+              }
+            });
+          });
+          return { type: 'FeatureCollection', features: features };
+        }
+
+        function showLocationPopup(feature) {
+          var p = feature.properties;
+          new mapboxgl.Popup({ offset: 16 })
+            .setLngLat(feature.geometry.coordinates)
+            .setHTML(
+              '<h3>' + p.name + '</h3>' +
+              '<div class="cat">' + p.category + '</div>' +
+              '<p>' + p.description + '</p>'
+            )
+            .addTo(marshallMap);
+        }
+
+        function bindLocationLayerEvents() {
+          if (marshallMap._locationEventsBound) return;
+          marshallMap._locationEventsBound = true;
+          ['marshall-locations-circles', 'marshall-locations-labels'].forEach(function(layerId) {
+            marshallMap.on('click', layerId, function(e) {
+              if (e.features && e.features[0]) showLocationPopup(e.features[0]);
+            });
+            marshallMap.on('mouseenter', layerId, function() { marshallMap.getCanvas().style.cursor = 'pointer'; });
+            marshallMap.on('mouseleave', layerId, function() { marshallMap.getCanvas().style.cursor = ''; });
+          });
+        }
+
+        function setupLocationLayers() {
+          if (!marshallMap.getSource(locationsSourceId)) {
+            marshallMap.addSource(locationsSourceId, {
+              type: 'geojson',
+              data: buildLocationsGeoJSON()
+            });
+            marshallMap.addLayer({
+              id: 'marshall-locations-circles',
+              type: 'circle',
+              source: locationsSourceId,
+              paint: {
+                'circle-radius': 7,
+                'circle-color': ['get', 'color'],
+                'circle-stroke-width': 2,
+                'circle-stroke-color': '#ffffff'
+              }
+            });
+            marshallMap.addLayer({
+              id: 'marshall-locations-labels',
+              type: 'symbol',
+              source: locationsSourceId,
+              layout: {
+                'text-field': ['get', 'name'],
+                'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                'text-size': 11,
+                'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+                'text-radial-offset': 0.9,
+                'text-justify': 'auto',
+                'text-allow-overlap': false,
+                'text-ignore-placement': false,
+                'text-optional': true,
+                'text-padding': 8,
+                'symbol-sort-key': ['get', 'sortKey']
+              },
+              paint: {
+                'text-color': '#111827',
+                'text-halo-color': '#ffffff',
+                'text-halo-width': 1.75
+              }
+            });
+            bindLocationLayerEvents();
+          }
+          updateLocationLayers();
+        }
+
+        function updateLocationLayers() {
+          if (!marshallMap || !marshallMap.getSource(locationsSourceId)) return;
+          marshallMap.getSource(locationsSourceId).setData(buildLocationsGeoJSON());
+          if (marshallMap.getLayer('marshall-locations-labels')) {
+            marshallMap.setLayoutProperty(
+              'marshall-locations-labels',
+              'visibility',
+              showLocationLabels ? 'visible' : 'none'
+            );
+          }
+        }
+
+        var northcottCenter = getNorthcottCenter();
+        marshallMap = new mapboxgl.Map({
+          container: 'marshall-map',
+          style: mapStyles.light,
+          center: northcottCenter,
+          zoom: 12,
+          attributionControl: true
+        });
+        marshallMap.addControl(new mapboxgl.NavigationControl(), 'top-left');
+
+        function isAffiliated(loc) {
+          return loc.category === 'Affiliated Medical Facility';
+        }
+
+        function locationVisible(loc) {
+          if (isAffiliated(loc)) return showAffiliatedSites;
+          return showCampusSites;
+        }
+
+        function updateRadiusCircle(miles) {
+          if (!marshallMap.getSource(radiusSourceId)) return;
+          var fillLayer = marshallMap.getLayer('study-radius-fill');
+          var lineLayer = marshallMap.getLayer('study-radius-line');
+          if (miles <= 0) {
+            if (fillLayer) marshallMap.setLayoutProperty('study-radius-fill', 'visibility', 'none');
+            if (lineLayer) marshallMap.setLayoutProperty('study-radius-line', 'visibility', 'none');
+            return;
+          }
+          if (fillLayer) marshallMap.setLayoutProperty('study-radius-fill', 'visibility', 'visible');
+          if (lineLayer) marshallMap.setLayoutProperty('study-radius-line', 'visibility', 'visible');
+          var center = getNorthcottCenter();
+          var km = miles * 1.60934;
+          var points = 64;
+          var coords = [];
+          for (var i = 0; i < points; i++) {
+            var angle = (i / points) * 2 * Math.PI;
+            var dx = (km / 111.32) * Math.cos(angle);
+            var dy = (km / 110.57) * Math.sin(angle);
+            coords.push([center[0] + dx / Math.cos(center[1] * Math.PI / 180), center[1] + dy]);
+          }
+          coords.push(coords[0]);
+          marshallMap.getSource(radiusSourceId).setData({
+            type: 'Feature',
+            geometry: { type: 'Polygon', coordinates: [coords] }
+          });
+        }
+
+        marshallMap.on('load', function() {
+          setupMarshallGeoLayers();
+
+          var center = getNorthcottCenter();
+          var defaultMiles = radiusFromIndex(document.getElementById('map-radius') ? document.getElementById('map-radius').value : 14);
+          marshallMap.fitBounds(boundsForRadiusAroundCenter(center, defaultMiles), {
+            padding: { top: 80, bottom: 80, left: 60, right: 320 },
+            maxZoom: 13
+          });
+        });
+
+        if (typeof IntersectionObserver !== 'undefined') {
+          var mapPanel = document.querySelector('.landing-map-panel');
+          if (mapPanel) {
+            var mapObserver = new IntersectionObserver(function(entries) {
+              entries.forEach(function(entry) {
+                document.body.classList.toggle('map-overlays-hidden', !entry.isIntersecting);
+                if (entry.isIntersecting) {
+                  if (marshallMap) marshallMap.resize();
+                  updateMapOverlayLayout();
+                }
+              });
+            }, { threshold: 0.15, rootMargin: '-' + (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 56) + 'px 0px 0px 0px' });
+            mapObserver.observe(mapPanel);
+          }
+        }
+
+        window.addEventListener('resize', function() {
+          if (marshallMap) marshallMap.resize();
+          updateMapOverlayLayout();
+        });
+        window.addEventListener('scroll', updateMapOverlayLayout, { passive: true });
+        setTimeout(updateMapOverlayLayout, 100);
+
+        var campusToggle = document.getElementById('map-layer-campus');
+        var locationLabelsToggle = document.getElementById('map-layer-location-labels');
+        var affiliatedToggle = document.getElementById('map-layer-affiliated');
+        var northcottToggle = document.getElementById('map-layer-northcott');
+        var marshallCampusToggle = document.getElementById('map-layer-marshall-campus');
+        var ideaToggle = document.getElementById('map-layer-idea');
+        function onLayerToggle() {
+          showCampusSites = campusToggle ? campusToggle.checked : true;
+          showLocationLabels = locationLabelsToggle ? locationLabelsToggle.checked : true;
+          showAffiliatedSites = affiliatedToggle ? affiliatedToggle.checked : true;
+          showNorthcottSite = northcottToggle ? northcottToggle.checked : true;
+          showMarshallCampus = marshallCampusToggle ? marshallCampusToggle.checked : true;
+          showIdeaDistrict = ideaToggle ? ideaToggle.checked : true;
+          if (!activeSiteEdit) {
+            setNorthcottVisibility(showNorthcottSite);
+            setMarshallCampusVisibility(showMarshallCampus);
+            setIdeaDistrictVisibility(showIdeaDistrict);
+          }
+          updateLocationLayers();
+        }
+        if (campusToggle) campusToggle.addEventListener('change', onLayerToggle);
+        if (locationLabelsToggle) locationLabelsToggle.addEventListener('change', onLayerToggle);
+        if (affiliatedToggle) affiliatedToggle.addEventListener('change', onLayerToggle);
+        if (northcottToggle) northcottToggle.addEventListener('change', onLayerToggle);
+        if (marshallCampusToggle) marshallCampusToggle.addEventListener('change', onLayerToggle);
+        if (ideaToggle) ideaToggle.addEventListener('change', onLayerToggle);
+        onLayerToggle();
+
+        var radiusInput = document.getElementById('map-radius');
+        var radiusLabel = document.getElementById('map-radius-label');
+        if (radiusInput) {
+          radiusInput.max = radiusSteps.length - 1;
+          radiusInput.addEventListener('input', function() {
+            var miles = radiusFromIndex(this.value);
+            if (radiusLabel) radiusLabel.textContent = formatRadiusMiles(miles);
+            updateRadiusCircle(miles);
+          });
+        }
+
+        document.querySelectorAll('.map-basemap-btns button').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            document.querySelectorAll('.map-basemap-btns button').forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+            var styleKey = btn.getAttribute('data-style');
+            if (mapStyles[styleKey]) {
+              var resumeEdit = activeSiteEdit;
+              if (siteDraw && marshallMap) {
+                try { marshallMap.removeControl(siteDraw); } catch (e) {}
+                siteDraw = null;
+              }
+              marshallMap.setStyle(mapStyles[styleKey]);
+              marshallMap.once('style.load', function() {
+                setupMarshallGeoLayers();
+                if (resumeEdit) startSiteEdit(resumeEdit);
+              });
+            }
+          });
+        });
+
+        var editNorthcottBtn = document.getElementById('edit-northcott-btn');
+        var editMarshallCampusBtn = document.getElementById('edit-marshall-campus-btn');
+        var editIdeaBtn = document.getElementById('edit-idea-btn');
+        var editDoneBtn = document.getElementById('edit-done-btn');
+        var copyCoordsBtn = document.getElementById('copy-site-coords-btn');
+        if (editNorthcottBtn) editNorthcottBtn.addEventListener('click', function() { startSiteEdit('northcott'); });
+        if (editMarshallCampusBtn) editMarshallCampusBtn.addEventListener('click', function() { startSiteEdit('marshallCampus'); });
+        if (editIdeaBtn) editIdeaBtn.addEventListener('click', function() { startSiteEdit('idea'); });
+        if (editDoneBtn) editDoneBtn.addEventListener('click', function() { finishSiteEdit(true); });
+        if (copyCoordsBtn) {
+          copyCoordsBtn.addEventListener('click', function() {
+            var exportEl = document.getElementById('site-coords-export');
+            if (!exportEl || !exportEl.value) return;
+            var copy = function(text) {
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                return navigator.clipboard.writeText(text);
+              }
+              exportEl.select();
+              document.execCommand('copy');
+              return Promise.resolve();
+            };
+            copy(exportEl.value).then(function() {
+              copyCoordsBtn.textContent = 'Copied!';
+              setTimeout(function() { copyCoordsBtn.textContent = 'Copy coordinates'; }, 1600);
+            });
+          });
+        }
+        setEditButtonsState();
+      })();
+
+      // Program & Tools: component detail tabs + map highlight
+      (function initProgramDetailTabs() {
+        var tabList = document.querySelector('.program-detail-tabs');
+        if (!tabList) return;
+        var programTabBtns = tabList.querySelectorAll('.program-detail-tabs__btn[data-program-tab]');
+        var tabIdToPanelId = { overview: 'program-detail-overview', academic: 'program-detail-academic', clinical: 'program-detail-clinical', 'student-residential': 'program-detail-student-residential', townhomes: 'program-detail-townhomes' };
+        var tabIdToRightPanelId = { overview: 'program-right-overview', academic: 'program-right-academic', clinical: 'program-right-clinical', 'student-residential': 'program-right-student-residential', townhomes: 'program-right-townhomes' };
+        var mapHighlight = {
+          overview: { show: 0 },
+          academic: { show: 1, x: '68%', y: '52%', r: '28%' },
+          clinical: { show: 1, x: '71%', y: '18%', r: '12%' },
+          'student-residential': { show: 1, x: '42%', y: '35%', r: '26%' },
+          townhomes: { show: 1, x: '24%', y: '46%', r: '22%' }
+        };
+        var mapEl = document.getElementById('program-map-container');
+        function setMapHighlight(tab) {
+          if (!mapEl) return;
+          var h = mapHighlight[tab] || mapHighlight.overview;
+          mapEl.style.setProperty('--hl-show', h.show);
+          if (h.show) {
+            mapEl.style.setProperty('--hl-x', h.x);
+            mapEl.style.setProperty('--hl-y', h.y);
+            mapEl.style.setProperty('--hl-r', h.r);
+          }
+        }
+        programTabBtns.forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var tab = btn.getAttribute('data-program-tab');
+            var panelId = tabIdToPanelId[tab];
+            var panel = panelId ? document.getElementById(panelId) : null;
+            if (!panel) return;
+            programTabBtns.forEach(function(b) {
+              b.classList.remove('active');
+              b.setAttribute('aria-selected', 'false');
+            });
+            btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
+            document.querySelectorAll('.program-detail-panel').forEach(function(p) {
+              var isActive = p === panel;
+              if (isActive) {
+                p.classList.add('active');
+                p.removeAttribute('hidden');
+              } else {
+                p.classList.remove('active');
+                p.setAttribute('hidden', '');
+              }
+            });
+            document.querySelectorAll('.program-right-panel').forEach(function(r) {
+              r.setAttribute('hidden', '');
+            });
+            var rightPanelId = tabIdToRightPanelId[tab];
+            if (rightPanelId) {
+              var rightPanel = document.getElementById(rightPanelId);
+              if (rightPanel) rightPanel.removeAttribute('hidden');
+            }
+            setMapHighlight(tab);
+          });
+        });
+        setMapHighlight('overview');
+      })();
+
+      (function initGrossingFactorSlider() {
+        var table = document.getElementById('curriculum-sf-table');
+        var slider = document.getElementById('grossing-factor-slider');
+        var valueEl = document.getElementById('grossing-factor-value');
+        var asfEl = document.getElementById('academic-asf-program');
+        var gsfTotal = 217500;
+        function getChildGsf(row) {
+          var asfCell = row.querySelector('td.curriculum-asf[data-gsf]');
+          if (asfCell) return parseInt(asfCell.getAttribute('data-gsf'), 10) || 0;
+          var gsfCell = row.querySelector('td.curriculum-rollup-gsf');
+          if (gsfCell && gsfCell.textContent) return parseInt(gsfCell.textContent.replace(/,/g, ''), 10) || 0;
+          return 0;
+        }
+        function updateCurriculumRollups(factor) {
+          if (!table || !factor) return;
+          var rollupGroups = ['life-library', 'other-library', 'administration', 'future-program', 'student-life', 'other-academic', 'classrooms'];
+          rollupGroups.forEach(function(groupId) {
+            var header = table.querySelector('tr.group-header[data-group="' + groupId + '"]');
+            if (!header) return;
+            var asfCell = header.querySelector('td.curriculum-rollup-asf');
+            var gsfCell = header.querySelector('td.curriculum-rollup-gsf');
+            if (!asfCell || !gsfCell) return;
+            var sum = 0;
+            table.querySelectorAll('tr.group-child[data-parent="' + groupId + '"]').forEach(function(row) {
+              sum += getChildGsf(row);
+            });
+            gsfCell.textContent = sum > 0 ? sum.toLocaleString() : '—';
+            asfCell.textContent = sum > 0 ? Math.round(sum / factor).toLocaleString() : '—';
+          });
+        }
+        function update() {
+          var factor = slider ? parseFloat(slider.value) : 1.5;
+          if (valueEl) valueEl.textContent = factor.toFixed(3).replace(/\.?0+$/, '');
+          if (asfEl) asfEl.textContent = Math.round(gsfTotal / factor).toLocaleString();
+          table.querySelectorAll('.curriculum-asf[data-gsf]').forEach(function(cell) {
+            var gsf = parseInt(cell.getAttribute('data-gsf'), 10);
+            if (!isNaN(gsf)) {
+              cell.textContent = Math.round(gsf / factor).toLocaleString();
+              var gsfCell = cell.nextElementSibling;
+              if (gsfCell && gsfCell.classList.contains('curriculum-gsf')) gsfCell.textContent = gsf > 0 ? gsf.toLocaleString() : '—';
+            }
+          });
+          updateCurriculumRollups(factor);
+        }
+        if (slider) {
+          slider.addEventListener('input', update);
+          slider.addEventListener('change', update);
+        }
+        update();
+      })();
+
+      (function initResidentialGrossingSlider() {
+        var slider = document.getElementById('residential-grossing-factor-slider');
+        var valueEl = document.getElementById('residential-grossing-factor-value');
+        var asfEl = document.getElementById('residential-asf-program');
+        var gsfTotal = 77076;
+        function update() {
+          var factor = slider ? parseFloat(slider.value) : 1.5;
+          if (valueEl) valueEl.textContent = factor.toFixed(3).replace(/\.?0+$/, '');
+          if (asfEl) asfEl.textContent = Math.round(gsfTotal / factor).toLocaleString();
+        }
+        if (slider) {
+          slider.addEventListener('input', update);
+          slider.addEventListener('change', update);
+        }
+        update();
+      })();
+
+      (function initCurriculumCollapse() {
+        var table = document.getElementById('curriculum-sf-table');
+        if (!table) return;
+        function setGroupCollapsed(header, collapsed) {
+          var group = header.getAttribute('data-group');
+          if (!group) return;
+          if (collapsed) {
+            header.classList.remove('expanded');
+            header.classList.add('collapsed');
+            header.setAttribute('aria-expanded', 'false');
+            table.querySelectorAll('tr.group-child[data-parent="' + group + '"]').forEach(function(row) {
+              row.classList.remove('is-visible');
+            });
+          } else {
+            header.classList.remove('collapsed');
+            header.classList.add('expanded');
+            header.setAttribute('aria-expanded', 'true');
+            table.querySelectorAll('tr.group-child[data-parent="' + group + '"]').forEach(function(row) {
+              row.classList.add('is-visible');
+            });
+          }
+        }
+        // Default: all collapsible groups start collapsed (no children visible)
+        var groupsToCollapse = ['other-academic', 'student-life', 'administration', 'future-program'];
+        groupsToCollapse.forEach(function(groupId) {
+          var header = table.querySelector('tr.group-header[data-group="' + groupId + '"]');
+          if (header) setGroupCollapsed(header, true);
+        });
+        // Single delegated click on table so collapse always works
+        table.addEventListener('click', function(e) {
+          var header = e.target.closest('tr.group-header');
+          if (!header || !header.closest || !header.closest('#curriculum-sf-table')) return;
+          var group = header.getAttribute('data-group');
+          if (!group) return;
+          var isExpanded = header.classList.contains('expanded');
+          setGroupCollapsed(header, isExpanded);
+        });
+        table.addEventListener('keydown', function(e) {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          var header = e.target.closest('tr.group-header');
+          if (!header || !header.closest('#curriculum-sf-table')) return;
+          e.preventDefault();
+          var group = header.getAttribute('data-group');
+          if (!group) return;
+          var isExpanded = header.classList.contains('expanded');
+          setGroupCollapsed(header, isExpanded);
+        });
+      })();
+
+      (function initResidentialCollapse() {
+        var table = document.getElementById('residential-sf-table');
+        if (!table) return;
+        function setGroupCollapsed(header, collapsed) {
+          var group = header.getAttribute('data-group');
+          if (!group) return;
+          if (collapsed) {
+            header.classList.remove('expanded');
+            header.classList.add('collapsed');
+            header.setAttribute('aria-expanded', 'false');
+            table.querySelectorAll('tr.group-child[data-parent="' + group + '"]').forEach(function(row) {
+              row.classList.remove('is-visible');
+            });
+          } else {
+            header.classList.remove('collapsed');
+            header.classList.add('expanded');
+            header.setAttribute('aria-expanded', 'true');
+            table.querySelectorAll('tr.group-child[data-parent="' + group + '"]').forEach(function(row) {
+              row.classList.add('is-visible');
+            });
+          }
+        }
+        ['residential-rooms', 'residential-shared', 'residential-suites'].forEach(function(groupId) {
+          var header = table.querySelector('tr.group-header[data-group="' + groupId + '"]');
+          if (header) setGroupCollapsed(header, true);
+        });
+        table.addEventListener('click', function(e) {
+          var header = e.target.closest('tr.group-header');
+          if (!header || !header.closest('#residential-sf-table')) return;
+          var group = header.getAttribute('data-group');
+          if (!group) return;
+          var isExpanded = header.classList.contains('expanded');
+          setGroupCollapsed(header, isExpanded);
+        });
+        table.addEventListener('keydown', function(e) {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          var header = e.target.closest('tr.group-header');
+          if (!header || !header.closest('#residential-sf-table')) return;
+          e.preventDefault();
+          var group = header.getAttribute('data-group');
+          if (!group) return;
+          var isExpanded = header.classList.contains('expanded');
+          setGroupCollapsed(header, isExpanded);
+        });
+      })();
+
+      (function initClinicalGrossingSlider() {
+        var slider = document.getElementById('clinical-grossing-factor-slider');
+        var valueEl = document.getElementById('clinical-grossing-factor-value');
+        var asfEl = document.getElementById('clinical-asf-program');
+        var gsfTotal = 15000;
+        function update() {
+          var factor = slider ? parseFloat(slider.value) : 1.5;
+          if (valueEl) valueEl.textContent = factor.toFixed(3).replace(/\.?0+$/, '');
+          if (asfEl) asfEl.textContent = Math.round(gsfTotal / factor).toLocaleString();
+        }
+        if (slider) {
+          slider.addEventListener('input', update);
+          slider.addEventListener('change', update);
+        }
+        update();
+      })();
+
+      (function initClinicalCollapse() {
+        var table = document.getElementById('clinical-sf-table');
+        if (!table) return;
+        function setGroupCollapsed(header, collapsed) {
+          var group = header.getAttribute('data-group');
+          if (!group) return;
+          if (collapsed) {
+            header.classList.remove('expanded');
+            header.classList.add('collapsed');
+            header.setAttribute('aria-expanded', 'false');
+            table.querySelectorAll('tr.group-child[data-parent="' + group + '"]').forEach(function(row) {
+              row.classList.remove('is-visible');
+            });
+          } else {
+            header.classList.remove('collapsed');
+            header.classList.add('expanded');
+            header.setAttribute('aria-expanded', 'true');
+            table.querySelectorAll('tr.group-child[data-parent="' + group + '"]').forEach(function(row) {
+              row.classList.add('is-visible');
+            });
+          }
+        }
+        var groupsToCollapse = ['clinical-arrival', 'clinical-care', 'clinical-diagnostics', 'clinical-care-team', 'clinical-support', 'clinical-staff', 'clinical-technology'];
+        groupsToCollapse.forEach(function(groupId) {
+          var header = table.querySelector('tr.group-header[data-group="' + groupId + '"]');
+          if (header) setGroupCollapsed(header, true);
+        });
+        table.addEventListener('click', function(e) {
+          var header = e.target.closest('tr.group-header');
+          if (!header || !header.closest('#clinical-sf-table')) return;
+          var group = header.getAttribute('data-group');
+          if (!group) return;
+          var isExpanded = header.classList.contains('expanded');
+          setGroupCollapsed(header, isExpanded);
+        });
+        table.addEventListener('keydown', function(e) {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          var header = e.target.closest('tr.group-header');
+          if (!header || !header.closest('#clinical-sf-table')) return;
+          e.preventDefault();
+          var group = header.getAttribute('data-group');
+          if (!group) return;
+          var isExpanded = header.classList.contains('expanded');
+          setGroupCollapsed(header, isExpanded);
+        });
+      })();
+
+      (function initTownhomesCollapse() {
+        var table = document.getElementById('townhomes-sf-table');
+        if (!table) return;
+        function setGroupCollapsed(header, collapsed) {
+          var group = header.getAttribute('data-group');
+          if (!group) return;
+          if (collapsed) {
+            header.classList.remove('expanded');
+            header.classList.add('collapsed');
+            header.setAttribute('aria-expanded', 'false');
+            table.querySelectorAll('tr.group-child[data-parent="' + group + '"]').forEach(function(row) {
+              row.classList.remove('is-visible');
+            });
+          } else {
+            header.classList.remove('collapsed');
+            header.classList.add('expanded');
+            header.setAttribute('aria-expanded', 'true');
+            table.querySelectorAll('tr.group-child[data-parent="' + group + '"]').forEach(function(row) {
+              row.classList.add('is-visible');
+            });
+          }
+        }
+        ['townhomes-community', 'townhomes-support', 'townhomes-unit-types'].forEach(function(groupId) {
+          var header = table.querySelector('tr.group-header[data-group="' + groupId + '"]');
+          if (header) setGroupCollapsed(header, true);
+        });
+        table.addEventListener('click', function(e) {
+          var header = e.target.closest('tr.group-header');
+          if (!header || !header.closest('#townhomes-sf-table')) return;
+          var group = header.getAttribute('data-group');
+          if (!group) return;
+          var isExpanded = header.classList.contains('expanded');
+          setGroupCollapsed(header, isExpanded);
+        });
+        table.addEventListener('keydown', function(e) {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          var header = e.target.closest('tr.group-header');
+          if (!header || !header.closest('#townhomes-sf-table')) return;
+          e.preventDefault();
+          var group = header.getAttribute('data-group');
+          if (!group) return;
+          var isExpanded = header.classList.contains('expanded');
+          setGroupCollapsed(header, isExpanded);
+        });
+      })();
+
+      (function initCostDetailTabs() {
+        var costTabList = document.querySelector('.cost-detail-tabs');
+        if (!costTabList) return;
+        var costTabBtns = costTabList.querySelectorAll('.cost-detail-tabs__btn[data-cost-tab]');
+        var costTabIdToPanelId = { overview: 'cost-detail-overview', academic: 'cost-detail-academic', clinical: 'cost-detail-clinical', 'student-residential': 'cost-detail-student-residential', townhomes: 'cost-detail-townhomes' };
+        var costTabIdToRightPanelId = { overview: 'cost-right-overview', academic: 'cost-right-academic', clinical: 'cost-right-clinical', 'student-residential': 'cost-right-student-residential', townhomes: 'cost-right-townhomes' };
+        var costMapHighlight = { overview: { show: 0 }, academic: { show: 1, x: '68%', y: '52%', r: '28%' }, clinical: { show: 1, x: '71%', y: '18%', r: '12%' }, 'student-residential': { show: 1, x: '42%', y: '35%', r: '26%' }, townhomes: { show: 1, x: '24%', y: '46%', r: '22%' } };
+        var costMapEl = document.getElementById('cost-map-container');
+        function setCostMapHighlight(tab) {
+          if (!costMapEl) return;
+          var h = costMapHighlight[tab] || costMapHighlight.overview;
+          costMapEl.style.setProperty('--hl-show', h.show);
+          if (h.show) {
+            costMapEl.style.setProperty('--hl-x', h.x);
+            costMapEl.style.setProperty('--hl-y', h.y);
+            costMapEl.style.setProperty('--hl-r', h.r);
+          }
+        }
+        costTabBtns.forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var tab = btn.getAttribute('data-cost-tab');
+            var panelId = costTabIdToPanelId[tab];
+            var panel = panelId ? document.getElementById(panelId) : null;
+            if (!panel) return;
+            costTabBtns.forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+            btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
+            document.querySelectorAll('.cost-detail-panel').forEach(function(p) {
+              var isActive = p === panel;
+              if (isActive) { p.classList.add('active'); p.removeAttribute('hidden'); } else { p.classList.remove('active'); p.setAttribute('hidden', ''); }
+            });
+            document.querySelectorAll('.cost-right-panel').forEach(function(r) { r.setAttribute('hidden', ''); });
+            var rightPanelId = costTabIdToRightPanelId[tab];
+            if (rightPanelId) {
+              var rightPanel = document.getElementById(rightPanelId);
+              if (rightPanel) rightPanel.removeAttribute('hidden');
+            }
+            setCostMapHighlight(tab);
+          });
+        });
+        setCostMapHighlight('overview');
+      })();
+
+      var schemeData = {
+        primary: { title: 'Primary (RFP)', rows: [
+          ['Number of buildings', '6'],
+          ['Total GSF', '386,076'],
+          ['Total FAR', '0.23'],
+          ['Beds', '300'],
+          ['Parking stalls', '461'],
+          ['Academic GSF', '217,500'],
+          ['Clinical GSF', '15,000'],
+          ['Residential GSF', '153,576'],
+          ['Academic A1', '114,375'],
+          ['Academic A2', '103,125'],
+          ['Clinic', '15,000'],
+          ['Residential R1', '77,076'],
+          ['Townhomes (total)', '76,500']
+        ]},
+        boulevard: { title: 'The Boulevard', rows: [
+          ['Number of buildings', '6'],
+          ['Total GSF', '382,000'],
+          ['Total FAR', '0.22'],
+          ['Beds', '300'],
+          ['Parking stalls', '455'],
+          ['Academic GSF', '215,000'],
+          ['Clinical GSF', '15,000'],
+          ['Residential GSF', '152,000'],
+          ['Academic A1', '112,000'],
+          ['Academic A2', '103,000'],
+          ['Clinic', '15,000'],
+          ['Residential R1', '76,000'],
+          ['Townhomes (total)', '76,000']
+        ]},
+        quad: { title: 'The Quad', rows: [
+          ['Number of buildings', '5'],
+          ['Total GSF', '385,200'],
+          ['Total FAR', '0.23'],
+          ['Beds', '300'],
+          ['Parking stalls', '460'],
+          ['Academic GSF', '218,000'],
+          ['Clinical GSF', '15,200'],
+          ['Residential GSF', '152,000'],
+          ['Academic A1', '118,000'],
+          ['Academic A2', '100,000'],
+          ['Clinic', '15,200'],
+          ['Residential R1', '76,000'],
+          ['Townhomes (total)', '76,000']
+        ]}
+      };
+      document.querySelectorAll('.img-popup').forEach(function(img) {
+        img.addEventListener('click', function() {
+          var popup = document.getElementById('img-popup');
+          var popupImg = document.getElementById('popup-img');
+          var metricsPanel = document.getElementById('popup-scheme-metrics');
+          var schemeTitle = document.getElementById('popup-scheme-title');
+          var schemeTable = document.getElementById('popup-scheme-table');
+          if (!popup || !popupImg) return;
+          popupImg.src = this.src;
+          popupImg.alt = this.alt;
+          var scheme = this.getAttribute('data-scheme');
+          if (scheme && schemeData[scheme] && metricsPanel && schemeTitle && schemeTable) {
+            popup.classList.add('has-metrics');
+            schemeTitle.textContent = schemeData[scheme].title;
+            schemeTable.innerHTML = schemeData[scheme].rows.map(function(r) {
+              return '<tr><th>' + r[0] + '</th><td class="num">' + r[1] + '</td></tr>';
+            }).join('');
+          } else {
+            popup.classList.remove('has-metrics');
+          }
+          popup.classList.add('visible');
+        });
+      });
+      function closeImgPopup() {
+        var popup = document.getElementById('img-popup');
+        if (popup) {
+          popup.classList.remove('visible', 'has-metrics');
+        }
+      }
+      document.getElementById('popup-close').addEventListener('click', closeImgPopup);
+      document.getElementById('img-popup').addEventListener('click', function(e) {
+        if (e.target === this) closeImgPopup();
+      });
+
+      var calcPanel = document.getElementById('calc-panel');
+      var calcDrag = document.getElementById('calc-drag');
+      function openCalcPanel() {
+        if (!calcPanel) return;
+        calcPanel.classList.add('visible');
+        calcPanel.style.setProperty('display', 'flex', 'important');
+        calcPanel.style.setProperty('visibility', 'visible', 'important');
+        if (!calcPanel.style.left || calcPanel.style.left === '') {
+          calcPanel.style.left = (window.innerWidth - 340 > 40 ? window.innerWidth - 360 : 20) + 'px';
+          calcPanel.style.top = '80px';
+        }
+      }
+      function closeCalcPanel() {
+        if (!calcPanel) return;
+        calcPanel.classList.remove('visible');
+        calcPanel.style.display = 'none';
+      }
+      document.addEventListener('click', function(e) {
+        var t = e.target;
+        var isOpenBtn = t && (t.id === 'calc-open-btn' || t.classList.contains('calc-open-btn') || (t.closest && t.closest('#calc-open-btn')));
+        if (isOpenBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          openCalcPanel();
+        }
+      }, true);
+      var calcOpenBtn = document.getElementById('calc-open-btn');
+      if (calcOpenBtn) {
+        calcOpenBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openCalcPanel();
+          return false;
+        });
+        calcOpenBtn.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openCalcPanel();
+          return false;
+        }, true);
+      }
+      document.addEventListener('click', function(e) {
+        var t = e.target;
+        if (t && (t.id === 'calc-close' || t.id === 'calc-close-x' || t.closest && (t.closest('#calc-close') || t.closest('#calc-close-x')))) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeCalcPanel();
+        }
+      }, true);
+      var calcCloseEl = document.getElementById('calc-close');
+      var calcCloseX = document.getElementById('calc-close-x');
+      if (calcCloseEl) calcCloseEl.onclick = function(e) { e.preventDefault(); closeCalcPanel(); return false; };
+      if (calcCloseX) calcCloseX.onclick = function(e) { e.preventDefault(); e.stopPropagation(); closeCalcPanel(); return false; };
+      if (calcDrag && calcPanel) {
+        var dragging = false, startX, startY, startLeft, startTop;
+        calcDrag.addEventListener('mousedown', function(e) {
+          if (e.target.id === 'calc-close-x' || e.target.closest('#calc-close-x')) return;
+          e.preventDefault();
+          dragging = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          startLeft = calcPanel.offsetLeft;
+          startTop = calcPanel.offsetTop;
+        });
+        document.addEventListener('mousemove', function(e) {
+          if (!dragging) return;
+          var dx = e.clientX - startX, dy = e.clientY - startY;
+          var left = startLeft + dx, top = startTop + dy;
+          left = Math.max(0, Math.min(left, window.innerWidth - calcPanel.offsetWidth));
+          top = Math.max(0, Math.min(top, window.innerHeight - 80));
+          calcPanel.style.left = left + 'px';
+          calcPanel.style.top = top + 'px';
+        });
+        document.addEventListener('mouseup', function() { dragging = false; });
+      }
+      var calcResize = document.getElementById('calc-resize');
+      if (calcResize && calcPanel) {
+        var resizing = false, rStartX, rStartY, rStartW, rStartH;
+        calcResize.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          resizing = true;
+          rStartX = e.clientX;
+          rStartY = e.clientY;
+          rStartW = calcPanel.offsetWidth;
+          rStartH = calcPanel.offsetHeight;
+        });
+        document.addEventListener('mousemove', function(e) {
+          if (!resizing) return;
+          var dw = e.clientX - rStartX, dh = e.clientY - rStartY;
+          var w = Math.max(280, Math.min(window.innerWidth - 40, rStartW + dw));
+          var h = Math.max(320, Math.min(window.innerHeight - 80, rStartH + dh));
+          calcPanel.style.width = w + 'px';
+          calcPanel.style.height = h + 'px';
+        });
+        document.addEventListener('mouseup', function() { resizing = false; });
+      }
+
+      function formatNum(n) { return n.toLocaleString(); }
+      function getAcademic() { return parseInt(document.getElementById('gsf-academic').value, 10) || 217500; }
+      function getClinic() { return parseInt(document.getElementById('gsf-clinic').value, 10) || 15000; }
+      function getResidential() { return parseInt(document.getElementById('gsf-residential').value, 10) || 77076; }
+      function getTownhomes() { return parseInt(document.getElementById('gsf-townhomes').value, 10) || 76500; }
+      function getStudents() { return parseInt(document.getElementById('students').value, 10) || 1000; }
+      function getBudget() { return parseInt(document.getElementById('budget').value, 10) || 350; }
+
+      function updateAll() {
+        var acad = getAcademic();
+        var clinic = getClinic();
+        var res = getResidential();
+        var th = getTownhomes();
+        var total = acad + clinic + res + th;
+        var students = getStudents();
+        var budget = getBudget();
+        var budgetDollars = budget * 1e6;
+
+        var outTotal = document.getElementById('out-total-gsf');
+        var outPct = document.getElementById('out-acad-pct');
+        var costGsf = document.getElementById('cost-gsf');
+        if (outTotal) outTotal.textContent = formatNum(total);
+        if (outPct) outPct.textContent = (acad / total * 100).toFixed(1) + '%';
+        if (costGsf) costGsf.value = total;
+
+        var sfPerStudent = students ? acad / students : 0;
+        var outSf = document.getElementById('out-sf-student');
+        var outBench = document.getElementById('out-benchmark');
+        if (outSf) outSf.textContent = sfPerStudent.toFixed(1);
+        if (outBench) outBench.textContent = sfPerStudent >= 200 && sfPerStudent <= 250 ? 'Within range' : (sfPerStudent < 200 ? 'Below' : 'Above');
+
+        var costPerGsf = total ? (budgetDollars / total).toFixed(0) : '—';
+        var outCost = document.getElementById('out-cost-gsf');
+        if (outCost) outCost.textContent = costPerGsf === '—' ? '—' : '$' + costPerGsf;
+
+        var benchPe = document.getElementById('bench-pe');
+        if (benchPe) benchPe.textContent = sfPerStudent.toFixed(1);
+      }
+      ['gsf-academic','gsf-clinic','gsf-residential','gsf-townhomes','students','budget'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateAll);
+      });
+      updateAll();
+
+      // —— Interactive charts (Chart.js) ——
+      var chartColors = {
+        academic: 'rgba(30, 73, 118, 0.9)',
+        clinic: 'rgba(99, 179, 237, 0.9)',
+        residential: 'rgba(236, 201, 75, 0.9)',
+        townhomes: 'rgba(221, 107, 32, 0.9)',
+        total: 'rgba(74, 85, 104, 0.9)',
+        border: ['#1e4976', '#63b3ed', '#ecc94b', '#dd6b20', '#4a5568'],
+        hover: ['#163a5f', '#4299e1', '#d69e2e', '#c05621', '#2d3748']
+      };
+
+      function getProgramData() {
+        return {
+          labels: ['Academic (A1+A2)', 'Clinical Facility', 'Student Residential (R1)', 'Townhomes'],
+          acad: getAcademic(),
+          clinic: getClinic(),
+          res: getResidential(),
+          th: getTownhomes()
+        };
+      }
+
+      var programPieChart = null;
+      var programPieCtx = document.getElementById('program-pie-chart');
+      if (programPieCtx && typeof Chart !== 'undefined') {
+        var d = getProgramData();
+        var total = d.acad + d.clinic + d.res + d.th;
+        programPieChart = new Chart(programPieCtx, {
+          type: 'pie',
+          data: {
+            labels: d.labels,
+            datasets: [{
+              data: [d.acad, d.clinic, d.res, d.th],
+              backgroundColor: [chartColors.academic, chartColors.clinic, chartColors.residential, chartColors.townhomes],
+              borderColor: chartColors.border,
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom' },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    var pct = total ? ((ctx.raw / total) * 100).toFixed(1) : 0;
+                    return ctx.label + ': ' + ctx.raw.toLocaleString() + ' GSF (' + pct + '%)';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      function getOnCampusStudents() {
+        var enrollEl = document.getElementById('overview-enrollment-slider');
+        var retainEl = document.getElementById('overview-retention-slider');
+        var enrollment = enrollEl ? parseInt(enrollEl.value, 10) : 1250;
+        var retentionPct = retainEl ? parseInt(retainEl.value, 10) : 100;
+        var retention = retentionPct / 100;
+        return Math.round(enrollment * (1 + retention)) || 1;
+      }
+      function getStudentsHousedOnCampus() {
+        var el = document.getElementById('overview-students-housed');
+        return (el ? parseInt(el.value, 10) : 150) || 1;
+      }
+
+      function getSfTotalInclude() {
+        return {
+          acad: document.getElementById('sf-total-include-acad') && document.getElementById('sf-total-include-acad').checked,
+          clinic: document.getElementById('sf-total-include-clinic') && document.getElementById('sf-total-include-clinic').checked,
+          res: document.getElementById('sf-total-include-res') && document.getElementById('sf-total-include-res').checked,
+          th: document.getElementById('sf-total-include-th') && document.getElementById('sf-total-include-th').checked
+        };
+      }
+
+      var programSfPerStudentChart = null;
+      var programSfPerStudentCtx = document.getElementById('program-sf-per-student-chart');
+      if (programSfPerStudentCtx && typeof Chart !== 'undefined') {
+        var d = getProgramData();
+        var onCampus = getOnCampusStudents();
+        var studentsHoused = getStudentsHousedOnCampus();
+        var incl = getSfTotalInclude();
+        var totalGsf = (incl.acad ? d.acad : 0) + (incl.clinic ? d.clinic : 0) + (incl.res ? d.res : 0) + (incl.th ? d.th : 0);
+        programSfPerStudentChart = new Chart(programSfPerStudentCtx, {
+          type: 'bar',
+          data: {
+            labels: d.labels.concat(['Total']),
+            datasets: [{
+              label: 'SF / student',
+              data: [
+                onCampus ? d.acad / onCampus : 0,
+                onCampus ? d.clinic / onCampus : 0,
+                studentsHoused ? d.res / studentsHoused : 0,
+                onCampus ? d.th / onCampus : 0,
+                onCampus ? totalGsf / onCampus : 0
+              ],
+              backgroundColor: [chartColors.academic, chartColors.clinic, chartColors.residential, chartColors.townhomes, chartColors.total],
+              borderColor: chartColors.border,
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    return ctx.raw.toFixed(1) + ' SF/student';
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: { display: true, text: 'SF / student' },
+                ticks: { callback: function(v) { return v.toLocaleString(); } }
+              }
+            }
+          }
+        });
+      }
+
+      function updateSfPerStudentChart() {
+        if (!programSfPerStudentChart) return;
+        var d = getProgramData();
+        var onCampus = getOnCampusStudents();
+        var studentsHoused = getStudentsHousedOnCampus();
+        var incl = getSfTotalInclude();
+        var totalGsf = (incl.acad ? d.acad : 0) + (incl.clinic ? d.clinic : 0) + (incl.res ? d.res : 0) + (incl.th ? d.th : 0);
+        programSfPerStudentChart.data.datasets[0].data = [
+          onCampus ? d.acad / onCampus : 0,
+          onCampus ? d.clinic / onCampus : 0,
+          studentsHoused ? d.res / studentsHoused : 0,
+          onCampus ? d.th / onCampus : 0,
+          onCampus ? totalGsf / onCampus : 0
+        ];
+        programSfPerStudentChart.update('none');
+      }
+
+      function updateProgramCharts() {
+        var d = getProgramData();
+        if (programPieChart) {
+          programPieChart.data.datasets[0].data = [d.acad, d.clinic, d.res, d.th];
+          programPieChart.update('none');
+        }
+        updateSfPerStudentChart();
+      }
+      ['gsf-academic','gsf-clinic','gsf-residential','gsf-townhomes'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateProgramCharts);
+      });
+      ['sf-total-include-acad','sf-total-include-clinic','sf-total-include-res','sf-total-include-th'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('change', updateSfPerStudentChart);
+      });
+      var overviewStudentsHousedEl = document.getElementById('overview-students-housed');
+      if (overviewStudentsHousedEl) overviewStudentsHousedEl.addEventListener('input', updateSfPerStudentChart);
+
+      // Campus Overview: student enrollment sliders
+      function updateOverviewEnrollment() {
+        var enrollEl = document.getElementById('overview-enrollment-slider');
+        var retainEl = document.getElementById('overview-retention-slider');
+        var enrollment = enrollEl ? parseInt(enrollEl.value, 10) : 1250;
+        var retentionPct = retainEl ? parseInt(retainEl.value, 10) : 100;
+        var retention = retentionPct / 100;
+        // Total students = sum of 4 cohorts with retention: enroll + enroll*r + enroll*r^2 + enroll*r^3
+        var totalStudents = retention >= 0.999
+          ? 4 * enrollment
+          : Math.round(enrollment * (1 - Math.pow(retention, 4)) / (1 - retention));
+        var onCampus = Math.round(enrollment * (1 + retention));
+        var totalEl = document.getElementById('overview-total-students-cell');
+        var enrollValEl = document.getElementById('overview-enrollment-value');
+        var onCampusEl = document.getElementById('overview-on-campus');
+        var enrollDisplayEl = document.getElementById('overview-enrollment-display');
+        var retainDisplayEl = document.getElementById('overview-retention-display');
+        var existingStudents = 3695;
+        var growth = totalStudents - existingStudents;
+        var growthPct = existingStudents > 0 ? ((growth / existingStudents) * 100).toFixed(1) : '0';
+        var staffNeeded = Math.round(totalStudents / 15);
+        if (totalEl) totalEl.innerHTML = '<strong>' + totalStudents.toLocaleString() + '</strong> (Existing 3,695 – ' + growthPct + '% growth)';
+        if (enrollValEl) enrollValEl.textContent = enrollment.toLocaleString();
+        if (onCampusEl) onCampusEl.textContent = onCampus.toLocaleString();
+        var staffEl = document.getElementById('overview-staff-needed');
+        if (staffEl) staffEl.textContent = staffNeeded.toLocaleString() + ' Staff';
+        if (enrollDisplayEl) enrollDisplayEl.textContent = enrollment.toLocaleString();
+        if (retainDisplayEl) retainDisplayEl.textContent = retentionPct + '%';
+        if (enrollEl) enrollEl.setAttribute('aria-valuetext', enrollment.toLocaleString());
+        if (retainEl) retainEl.setAttribute('aria-valuetext', retentionPct + '%');
+        updateSfPerStudentChart();
+      }
+      var overviewEnrollSlider = document.getElementById('overview-enrollment-slider');
+      var overviewRetainSlider = document.getElementById('overview-retention-slider');
+      if (overviewEnrollSlider) overviewEnrollSlider.addEventListener('input', updateOverviewEnrollment);
+      if (overviewRetainSlider) overviewRetainSlider.addEventListener('input', updateOverviewEnrollment);
+      updateOverviewEnrollment();
+      updateSfPerStudentChart();
+
+      // Cost Estimating charts (static data from table)
+      var costPieCtx = document.getElementById('cost-pie-chart');
+      var costColCtx = document.getElementById('cost-column-chart');
+      var costLabelsBar = ['Academic', 'Clinic', 'Residential'];
+      var costValuesBase = [152.5, 12.5, 81]; // $M ex VAT
+      var costValuesInclVat = [179.5, 14.5, 95]; // $M incl. VAT
+      var costHardTotal = 246; // 152.5 + 12.5 + 81
+      var costHardTotalInclVat = 289; // 179.5 + 14.5 + 95
+      var costLand = 27; // $M, never includes VAT, not in column chart
+      var costTargetHardExVat = 273; // dynamic base for hard cost target
+      var costTargetHardInclVat = 316; // 273 scaled for VAT
+      var costTotalGSF = 386076;
+      var costHardSubtotal = 272; // sub total for land + construction (display)
+      var costGsfLabels = [217500, 15000, 153576];
+      var costPieChart = null;
+      var costPieLabels = ['Academic', 'Clinic', 'Residential', 'Land Cost'];
+      if (costPieCtx && typeof Chart !== 'undefined') {
+        costPieChart = new Chart(costPieCtx, {
+          type: 'pie',
+          data: {
+            labels: costPieLabels,
+            datasets: [{
+              data: [],
+              backgroundColor: [chartColors.academic, chartColors.clinic, chartColors.residential, chartColors.townhomes],
+              borderColor: [chartColors.border[0], chartColors.border[1], chartColors.border[2], chartColors.border[3]],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  generateLabels: function(chart) {
+                    var data = chart.data;
+                    var ds = data.datasets[0];
+                    if (!ds || !ds.data.length) return [];
+                    var total = ds.data.reduce(function(a, b) { return a + b; }, 0);
+                    return data.labels.map(function(label, i) {
+                      var value = ds.data[i];
+                      var pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+                      return { text: label + ' (' + pct + '%)', fillStyle: ds.backgroundColor[i], index: i };
+                    });
+                  }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    var total = ctx.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                    var pct = total > 0 ? ((ctx.raw / total) * 100).toFixed(1) : '0';
+                    return ctx.label + ': $' + (ctx.raw / 1e6).toFixed(1) + 'M (' + pct + '%)';
+                  }
+                }
+              },
+              datalabels: {
+                color: '#fff',
+                font: { weight: '600', size: 12 },
+                formatter: function(value, ctx) {
+                  var total = ctx.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                  var pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+                  return pct + '%';
+                }
+              }
+            }
+          }
+        });
+      }
+      // Curriculum Overview: data-driven module list and timeline
+      var curriculumModules = [
+        'Fundamentals and Foundations of Medicine 1',
+        'Fundamentals and Foundations of Medicine 2',
+        'Hematology, Oncology, Infection and Immunity',
+        'Integumentary and Musculoskeletal',
+        'Cardiology',
+        'Pulmonology and Nephrology',
+        'Gastroenterology and Nutrition',
+        'Endocrinology and Reproduction',
+        'Neurology and Psychiatry',
+        'Multisystem Integration and Clinical Reasoning'
+      ];
+      var moduleGridEl = document.getElementById('curriculum-module-grid');
+      if (moduleGridEl && curriculumModules.length >= 10) {
+        var y1Modules = curriculumModules.slice(0, 6);
+        var y2Modules = curriculumModules.slice(6, 10);
+        var y1List = y1Modules.map(function(name, i) {
+          return '<li><span class="mod-num">Module ' + (i + 1) + '</span><span>' + name + '</span></li>';
+        }).join('');
+        var y2List = y2Modules.map(function(name, i) {
+          return '<li><span class="mod-num">Module ' + (i + 7) + '</span><span>' + name + '</span></li>';
+        }).join('');
+        moduleGridEl.innerHTML =
+          '<div class="curriculum-year-block curriculum-year-block--y1"><div class="curriculum-year-block__title">Year 1</div><ul class="curriculum-module-list">' + y1List + '</ul></div>' +
+          '<div class="curriculum-year-block curriculum-year-block--y2"><div class="curriculum-year-block__title">Year 2</div><ul class="curriculum-module-list">' + y2List + '</ul></div>';
+      }
+      var seasons = [
+        { name: 'Fall', weeks: 15, year1: [1, 2], year2: [7, 8] },
+        { name: 'Spring', weeks: 15, year1: [3, 4], year2: [9, 10] },
+        { name: 'Summer', weeks: 15, year1: [5, 6], year2: [] }
+      ];
+      var timelineGrid = document.getElementById('timeline-grid');
+      if (timelineGrid) {
+        seasons.forEach(function(s) {
+          var seasonCell = '<div class="season"><div class="season__name">' + s.name + '</div><div class="season__weeks">(' + s.weeks + ' weeks)</div></div>';
+          var y1Pills = (s.year1 || []).map(function(n) { return '<div class="pill pill--y1">' + n + '</div>'; }).join('');
+          var y2Pills = (s.year2 || []).map(function(n) { return '<div class="pill pill--y2">' + n + '</div>'; }).join('');
+          var y1Col = '<div class="yearcol yearcol--y1">' + y1Pills + '</div>';
+          var y2Empty = (s.year2 && s.year2.length) ? '' : ' yearcol--empty';
+          var y2Col = '<div class="yearcol yearcol--y2' + y2Empty + '">' + y2Pills + '</div>';
+          timelineGrid.innerHTML += seasonCell + y1Col + y2Col;
+        });
+      }
+
+      var costColumnChart = null;
+      function updateCostColumnAndTotal() {
+        var showVat = document.body.classList.contains('cost-show-vat');
+        var softSlider = document.getElementById('cost-soft-factor-slider');
+        var contingencySlider = document.getElementById('cost-contingency-slider');
+        var softVal = softSlider ? parseFloat(softSlider.value) : 1;
+        var contingencyVal = contingencySlider ? parseFloat(contingencySlider.value) : 1;
+        var hardCost = showVat ? costHardTotalInclVat : costHardTotal;
+        var softCost = hardCost * (softVal - 1);
+        var contingencyAmount = hardCost * softVal * (contingencyVal - 1);
+        var buildingTotal = hardCost * softVal * contingencyVal;
+        var totalWithLand = costLand + buildingTotal;
+        var hardSubtotal = costLand + hardCost;
+        if (document.getElementById('cost-soft-factor-value')) document.getElementById('cost-soft-factor-value').textContent = softVal.toFixed(2);
+        if (document.getElementById('cost-contingency-value')) document.getElementById('cost-contingency-value').textContent = contingencyVal.toFixed(2);
+        if (document.getElementById('cost-breakdown-land')) document.getElementById('cost-breakdown-land').textContent = costLand.toFixed(1);
+        if (document.getElementById('cost-breakdown-hard')) document.getElementById('cost-breakdown-hard').textContent = hardCost.toFixed(1);
+        var costBaseDisplay = showVat ? costValuesInclVat : costValuesBase;
+        if (document.getElementById('cost-breakdown-academic')) document.getElementById('cost-breakdown-academic').textContent = costBaseDisplay[0].toFixed(1);
+        if (document.getElementById('cost-breakdown-clinic')) document.getElementById('cost-breakdown-clinic').textContent = costBaseDisplay[1].toFixed(1);
+        if (document.getElementById('cost-breakdown-residential')) document.getElementById('cost-breakdown-residential').textContent = costBaseDisplay[2].toFixed(1);
+        if (document.getElementById('cost-breakdown-soft')) document.getElementById('cost-breakdown-soft').textContent = softCost > 0 ? softCost.toFixed(1) : '—';
+        if (document.getElementById('cost-breakdown-contingency')) document.getElementById('cost-breakdown-contingency').textContent = contingencyAmount > 0 ? contingencyAmount.toFixed(1) : '—';
+        var softSubtotal = softCost + contingencyAmount;
+        var actualTotal = hardSubtotal + softSubtotal;
+        if (document.getElementById('cost-breakdown-subtotal')) document.getElementById('cost-breakdown-subtotal').textContent = hardSubtotal.toFixed(1);
+        if (document.getElementById('cost-breakdown-soft-subtotal')) document.getElementById('cost-breakdown-soft-subtotal').textContent = softSubtotal > 0 ? softSubtotal.toFixed(1) : '—';
+        if (document.getElementById('cost-total-value')) document.getElementById('cost-total-value').textContent = actualTotal.toFixed(1);
+        var targetHardVal = showVat ? costTargetHardInclVat : costTargetHardExVat;
+        var costTargetTotal = costLand + targetHardVal * softVal * contingencyVal;
+        if (document.getElementById('cost-breakdown-target-hard-inline')) document.getElementById('cost-breakdown-target-hard-inline').textContent = '(Target: ' + targetHardVal.toFixed(1) + ')';
+        if (document.getElementById('cost-breakdown-target-total-inline')) document.getElementById('cost-breakdown-target-total-inline').textContent = '(Target: ' + costTargetTotal.toFixed(1) + ')';
+        var totalRow = document.querySelector('.cost-total-row');
+        if (totalRow) totalRow.classList.toggle('cost-over-target', actualTotal > costTargetTotal);
+        var targetPsf = costTotalGSF > 0 ? Math.round((costTargetTotal * 1e6) / costTotalGSF) : 0;
+        if (document.getElementById('cost-breakdown-target-psf')) document.getElementById('cost-breakdown-target-psf').textContent = targetPsf > 0 ? targetPsf.toLocaleString() : '—';
+        if (costColumnChart && costColumnChart.data && costColumnChart.data.datasets) {
+          var costBase = showVat ? costValuesInclVat : costValuesBase;
+          costColumnChart.data.datasets[0].label = showVat ? 'Cost (incl. VAT, $M)' : 'Cost (ex VAT, $M)';
+          costColumnChart.data.datasets[0].data = costBase;
+          costColumnChart.data.datasets[1].data = costValuesBase.map(function(v) { return v * softVal * contingencyVal; });
+          costColumnChart.update('none');
+        }
+        if (costPieChart && costPieChart.data && costPieChart.data.datasets) {
+          var mult = softVal * contingencyVal;
+          var pieData = [
+            costValuesBase[0] * mult * 1e6,
+            costValuesBase[1] * mult * 1e6,
+            costValuesBase[2] * mult * 1e6,
+            costLand * 1e6
+          ];
+          costPieChart.data.datasets[0].data = pieData;
+          costPieChart.update('none');
+        }
+      }
+      (function initCostBreakdownCollapse() {
+        var table = document.querySelector('.cost-breakdown-table');
+        if (!table) return;
+        function toggleGroup(toggleRow) {
+          var group = toggleRow.getAttribute('data-cost-collapse-toggle');
+          if (!group) return;
+          var detailRows = table.querySelectorAll('tr[data-cost-collapse="' + group + '"]');
+          var isCollapsed = toggleRow.classList.toggle('cost-collapsed');
+          detailRows.forEach(function(row) { row.classList.toggle('cost-collapse-hidden', isCollapsed); });
+          toggleRow.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+        }
+        table.addEventListener('click', function(e) {
+          var row = e.target.closest('tr.cost-subtotal-row[data-cost-collapse-toggle]');
+          if (row) toggleGroup(row);
+        });
+        table.addEventListener('keydown', function(e) {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          var row = e.target.closest('tr.cost-subtotal-row[data-cost-collapse-toggle]');
+          if (row) { e.preventDefault(); toggleGroup(row); }
+        });
+      })();
+      (function initCostVatCheckbox() {
+        var cb = document.getElementById('cost-show-vat');
+        if (cb) cb.addEventListener('change', function() {
+          document.body.classList.toggle('cost-show-vat', this.checked);
+          updateCostColumnAndTotal();
+        });
+      })();
+      if (costColCtx && typeof Chart !== 'undefined') {
+        var softInit = 1;
+        var contInit = 1;
+        costColumnChart = new Chart(costColCtx, {
+          type: 'bar',
+          data: {
+            labels: costLabelsBar,
+            datasets: [
+              {
+                label: 'Cost (ex VAT, $M)',
+                data: costValuesBase,
+                backgroundColor: [chartColors.academic, chartColors.clinic, chartColors.residential],
+                borderColor: [chartColors.border[0], chartColors.border[1], chartColors.border[2]],
+                borderWidth: 1
+              },
+              {
+                label: 'Project cost (soft + contingency, $M)',
+                data: costValuesBase.map(function(v) { return v * softInit * contInit; }),
+                backgroundColor: [chartColors.academic, chartColors.clinic, chartColors.residential].map(function(c) { return c.replace('0.9)', '0.6)'); }),
+                borderColor: [chartColors.border[0], chartColors.border[1], chartColors.border[2]],
+                borderWidth: 1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { position: 'top' },
+              tooltip: {
+                callbacks: {
+                  afterBody: function(tooltipItems) {
+                    var i = tooltipItems[0].dataIndex;
+                    return 'GSF: ' + costGsfLabels[i].toLocaleString();
+                  }
+                }
+              }
+            },
+            scales: {
+              y: { type: 'linear', position: 'left', beginAtZero: true, title: { display: true, text: 'Cost ($M)' } }
+            }
+          }
+        });
+        updateCostColumnAndTotal();
+        var softSl = document.getElementById('cost-soft-factor-slider');
+        var contSl = document.getElementById('cost-contingency-slider');
+        if (softSl) { softSl.addEventListener('input', updateCostColumnAndTotal); softSl.addEventListener('change', updateCostColumnAndTotal); }
+        if (contSl) { contSl.addEventListener('input', updateCostColumnAndTotal); contSl.addEventListener('change', updateCostColumnAndTotal); }
+      }
+
+      // Resize charts when container size changes (e.g. browser zoom) to prevent overlap
+      if (typeof Chart !== 'undefined' && typeof ResizeObserver !== 'undefined') {
+        document.querySelectorAll('.chart-wrap canvas').forEach(function(canvas) {
+          var chart = Chart.getChart(canvas);
+          if (!chart) return;
+          var wrap = canvas.closest('.chart-wrap');
+          if (!wrap) return;
+          var ro = new ResizeObserver(function() {
+            chart.resize();
+          });
+          ro.observe(wrap);
+        });
+      }
+      window.addEventListener('resize', function() {
+        if (typeof Chart === 'undefined') return;
+        document.querySelectorAll('.chart-wrap canvas').forEach(function(canvas) {
+          var chart = Chart.getChart(canvas);
+          if (chart) chart.resize();
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

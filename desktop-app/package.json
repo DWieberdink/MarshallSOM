@@ -1,0 +1,36 @@
+{
+  "name": "covista-dashboard",
+  "version": "1.0.0",
+  "description": "Covista Campus Greenfield – Programming & Master Planning Dashboard (offline desktop app)",
+  "main": "main.js",
+  "author": "Covista",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "postinstall": "node copy-chart.js",
+    "dist": "electron-builder --win portable",
+    "dist:dir": "electron-builder --win portable --dir"
+  },
+  "devDependencies": {
+    "chart.js": "4.4.1",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.covista.dashboard",
+    "productName": "Covista Dashboard",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "dashboard/**/*"
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "Covista-Dashboard-${version}.exe"
+    }
+  }
+}

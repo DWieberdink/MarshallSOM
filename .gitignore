@@ -1,0 +1,10 @@
+.census-api-key
+mapbox-config.local.js
+.env
+.env.*
+_osm.json
+*.log
+Thumbs.db
+desktop-app/node_modules/
+desktop-app/dist/
+desktop-app/out/

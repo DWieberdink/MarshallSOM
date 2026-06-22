@@ -1,0 +1,12 @@
+Covista Campus Greenfield — Programming & Master Planning Dashboard
+====================================================================
+
+HOW TO OPEN THE DASHBOARD
+-------------------------
+• Double-click "Open Dashboard.bat" to open the dashboard in your browser.
+  — or —
+• Double-click "index.html" to open it in your default web browser.
+
+Keep this entire folder when sharing or moving (index.html + images + this file).
+No internet is required for the dashboard logic; images and charts work offline
+once the page is open (fonts and chart library load from the internet if available).
