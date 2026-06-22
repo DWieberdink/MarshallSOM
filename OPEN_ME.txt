@@ -10,3 +10,10 @@ HOW TO OPEN THE DASHBOARD
 Keep this entire folder when sharing or moving (index.html + images + this file).
 No internet is required for the dashboard logic; images and charts work offline
 once the page is open (fonts and chart library load from the internet if available).
+
+GITHUB PAGES (MAP)
+------------------
+If the map is missing on https://dwieberdink.github.io/MarshallSOM/ :
+1. GitHub repo → Settings → Pages → Build and deployment → Source: GitHub Actions
+2. Confirm secret MAPBOX_ACCESS_TOKEN is set under Settings → Secrets and variables → Actions
+3. Re-run the "Deploy GitHub Pages" workflow under the Actions tab if needed
