@@ -8,8 +8,12 @@
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
   <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
-  <script src="mapbox-config.local.js"></script>
-  <script src="mapbox-config.js"></script>
+  <script id="marshall-mapbox-token">window.MAPBOX_ACCESS_TOKEN='';</script>
+  <script>
+    if (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      document.write('<script src="mapbox-config.local.js"><\/script>');
+    }
+  </script>
   <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -2261,7 +2265,10 @@
 
         mapboxgl.accessToken = window.MAPBOX_ACCESS_TOKEN || '';
         if (!mapboxgl.accessToken) {
-          mapContainer.innerHTML = '<p style="padding:1rem;color:#6b7280;">Map not configured. For local use, copy <code>mapbox-config.example.js</code> to <code>mapbox-config.local.js</code>. For GitHub Pages, add the <code>MAPBOX_ACCESS_TOKEN</code> repository secret.</p>';
+          var pagesHint = location.hostname.indexOf('github.io') >= 0
+            ? ' For GitHub Pages, set repo Settings → Pages → Source to <strong>GitHub Actions</strong> and add the <code>MAPBOX_ACCESS_TOKEN</code> secret.'
+            : ' For local use, copy <code>mapbox-config.example.js</code> to <code>mapbox-config.local.js</code>.';
+          mapContainer.innerHTML = '<p style="padding:1rem;color:#6b7280;">Map not configured.' + pagesHint + '</p>';
           return;
         }
 
@@ -3138,6 +3145,7 @@
         var slider = document.getElementById('grossing-factor-slider');
         var valueEl = document.getElementById('grossing-factor-value');
         var asfEl = document.getElementById('academic-asf-program');
+        if (!table) return;
         var gsfTotal = 217500;
         function getChildGsf(row) {
           var asfCell = row.querySelector('td.curriculum-asf[data-gsf]');

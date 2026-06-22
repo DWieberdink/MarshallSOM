@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create Mapbox config for Pages
+      - name: Inject Mapbox token into index.html
         env:
           MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
           MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
@@ -35,7 +35,23 @@ jobs:
             echo "Add MAPBOX_ACCESS_TOKEN (or MAPBOX_TOKEN) under Settings → Secrets and variables → Actions."
             exit 1
           fi
-          printf "window.MAPBOX_ACCESS_TOKEN = '%s';\n" "$TOKEN" > mapbox-config.js
+          export TOKEN
+          python3 <<'PY'
+          import os
+          import re
+          token = os.environ["TOKEN"]
+          path = "index.html"
+          html = open(path, encoding="utf-8").read()
+          pattern = r"window\.MAPBOX_ACCESS_TOKEN='';"
+          replacement = "window.MAPBOX_ACCESS_TOKEN='" + token.replace("\\", "\\\\").replace("'", "\\'") + "';"
+          html, count = re.subn(pattern, replacement, html, count=1)
+          if count != 1:
+            raise SystemExit("Could not find Mapbox token placeholder in index.html")
+          open(path, "w", encoding="utf-8").write(html)
+          PY
+
+      - name: Verify Mapbox token injection
+        run: grep -q "MAPBOX_ACCESS_TOKEN='pk\\." index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

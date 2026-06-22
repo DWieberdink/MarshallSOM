@@ -14,6 +14,8 @@ once the page is open (fonts and chart library load from the internet if availab
 GITHUB PAGES (MAP)
 ------------------
 If the map is missing on https://dwieberdink.github.io/MarshallSOM/ :
-1. GitHub repo → Settings → Pages → Build and deployment → Source: GitHub Actions
-2. Confirm secret MAPBOX_ACCESS_TOKEN is set under Settings → Secrets and variables → Actions
-3. Re-run the "Deploy GitHub Pages" workflow under the Actions tab if needed
+1. GitHub repo → Settings → Pages → Build and deployment
+2. Set Source to "GitHub Actions" (NOT "Deploy from a branch")
+3. Confirm secret MAPBOX_ACCESS_TOKEN is set under Settings → Secrets and variables → Actions
+4. Open Actions → "Deploy GitHub Pages" → Re-run workflow if needed
+5. Wait 1–2 minutes, then hard-refresh the site (Ctrl+F5)
