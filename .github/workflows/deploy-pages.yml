@@ -6,10 +6,19 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,16 +27,21 @@ jobs:
       - name: Create Mapbox config for Pages
         env:
           MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
+          MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
         run: |
-          if [ -z "$MAPBOX_ACCESS_TOKEN" ]; then
-            echo "MAPBOX_ACCESS_TOKEN secret is not set in repository secrets."
+          TOKEN="$MAPBOX_ACCESS_TOKEN"
+          if [ -z "$TOKEN" ]; then TOKEN="$MAPBOX_TOKEN"; fi
+          if [ -z "$TOKEN" ]; then
+            echo "Add MAPBOX_ACCESS_TOKEN (or MAPBOX_TOKEN) under Settings → Secrets and variables → Actions."
             exit 1
           fi
-          printf "window.MAPBOX_ACCESS_TOKEN = '%s';\n" "$MAPBOX_ACCESS_TOKEN" > mapbox-config.js
+          printf "window.MAPBOX_ACCESS_TOKEN = '%s';\n" "$TOKEN" > mapbox-config.js
 
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
-          exclude_assets: '.github'
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
